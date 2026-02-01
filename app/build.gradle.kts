@@ -63,4 +63,7 @@ dependencies {
 
     //navigation 3
     implementation(libs.bundles.nav3)
+
+    //splash screen
+    implementation(libs.androidx.core.splashscreen)
 }
