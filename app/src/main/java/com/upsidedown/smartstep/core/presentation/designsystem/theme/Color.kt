@@ -1,4 +1,4 @@
-package com.upsidedown.smartstep.ui.theme
+package com.upsidedown.smartstep.core.presentation.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 val ButtonPrimary = Color(0xFF3A43B6)

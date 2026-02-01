@@ -1,4 +1,4 @@
-package com.upsidedown.smartstep
+package com.upsidedown.smartstep.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.upsidedown.smartstep.ui.theme.SmartStepTheme
+import com.upsidedown.smartstep.core.presentation.designsystem.theme.SmartStepTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

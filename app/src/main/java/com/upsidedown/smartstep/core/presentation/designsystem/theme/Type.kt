@@ -1,4 +1,4 @@
-package com.upsidedown.smartstep.ui.theme
+package com.upsidedown.smartstep.core.presentation.designsystem.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
