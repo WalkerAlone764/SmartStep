@@ -3,4 +3,15 @@
     <string name="label">Label</string>
     <string name="exit_dialog_message">The app will fully close and will not run in the background.</string>
     <string name="ok">Ok</string>
+    <string name="height">Height</string>
+    <string name="weight">Weight</string>
+    <string name="used_to_calculate_distance">Used to calculate distance</string>
+    <string name="used_to_calculate_calories">Used to calculate calories</string>
+    <string name="cm">cm</string>
+    <string name="ft_in">ft/in</string>
+    <string name="kg">kg</string>
+    <string name="lbs">lbs</string>
+    <string name="cancel">Cancel</string>
+    <string name="ft">ft</string>
+    <string name="in_unit">in</string>
 </resources>
