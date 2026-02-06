@@ -1,4 +1,4 @@
-package com.upsidedown.smartstep.core.presentation.designsystem.components
+package com.upsidedown.smartstep.core.presentation.designsystem.components.button
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
@@ -11,7 +11,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -20,7 +19,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.upsidedown.smartstep.core.presentation.designsystem.theme.SmartStepTheme
 import com.upsidedown.smartstep.core.presentation.designsystem.theme.bodyLargeMedium
-import com.upsidedown.smartstep.core.presentation.designsystem.theme.bodyMediumMedium
 
 sealed interface SmartStepButtonStyle {
     data object PRIMARY: SmartStepButtonStyle

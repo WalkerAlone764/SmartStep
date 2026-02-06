@@ -1,5 +1,7 @@
-package com.upsidedown.smartstep.core.presentation.designsystem.components
+package com.upsidedown.smartstep.core.presentation.designsystem.components.picker
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -83,11 +85,13 @@ fun SmartStepChip(
         border = border
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+            modifier = Modifier
+                .padding(horizontal = 24.dp, vertical = 12.dp)
+                .animateContentSize(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            if (isSelected) {
+            AnimatedVisibility (isSelected) {
                 CheckIcon(
                     color = contentColor,
                     modifier = Modifier.size(18.dp)
