@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -22,22 +21,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.upsidedown.smartstep.core.presentation.designsystem.components.button.SmartStepButton
 import com.upsidedown.smartstep.core.presentation.designsystem.theme.SmartStepTheme
-import com.upsidedown.smartstep.core.presentation.util.Gender
 import com.upsidedown.smartstep.profile.presentation.setup.presentation.component.GenderOptionComponent
 import com.upsidedown.smartstep.profile.presentation.setup.presentation.component.HeightOptionComponent
 import com.upsidedown.smartstep.profile.presentation.setup.presentation.component.ProfileSetupTopBar
 import com.upsidedown.smartstep.profile.presentation.setup.presentation.component.WeightOptionComponent
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ProfileSetupRoot(
-    viewModel: ProfileSetupViewModel = viewModel()
+    viewModel: ProfileSetupViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -154,7 +151,9 @@ fun ProfileSetupScreen(
 
                 SmartStepButton(
                     text = "Start",
-                    onClick = {},
+                    onClick = {
+                        onAction(ProfileSetupAction.OnStartClick)
+                    },
                     modifier = Modifier
                         .fillMaxWidth( )
                 )

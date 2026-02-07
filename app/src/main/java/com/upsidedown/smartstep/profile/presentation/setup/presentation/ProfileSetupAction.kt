@@ -6,6 +6,8 @@ import com.upsidedown.smartstep.core.presentation.util.Gender
 
 sealed interface ProfileSetupAction {
 
+    data object OnSkip: ProfileSetupAction
+
     data class OnChangeSelectedGender(val gender: Gender): ProfileSetupAction
 
     data object OnClickHeightType: ProfileSetupAction
@@ -19,5 +21,7 @@ sealed interface ProfileSetupAction {
     data class OnChangeWeightType(val weightType: SmartStepWeightType) : ProfileSetupAction
 
     data object OnDismissWeightTypeMenu: ProfileSetupAction
+    
+    data object OnStartClick: ProfileSetupAction
 
 }

@@ -5,13 +5,22 @@ import androidx.lifecycle.viewModelScope
 import com.upsidedown.smartstep.core.presentation.designsystem.components.picker.SmartStepHeightType
 import com.upsidedown.smartstep.core.presentation.designsystem.components.picker.SmartStepWeightType
 import com.upsidedown.smartstep.core.presentation.util.Gender
+import com.upsidedown.smartstep.profile.domain.HeightUnit
+import com.upsidedown.smartstep.profile.domain.Profile
+import com.upsidedown.smartstep.profile.domain.ProfileDataSource
+import com.upsidedown.smartstep.profile.domain.WeightUnit
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
-class ProfileSetupViewModel : ViewModel() {
+class ProfileSetupViewModel(
+    private val profileDataSource: ProfileDataSource
+) : ViewModel() {
 
     private var hasLoadedInitialData = false
 
@@ -19,7 +28,29 @@ class ProfileSetupViewModel : ViewModel() {
     val state = _state
         .onStart {
             if (!hasLoadedInitialData) {
-                /** Load initial data here **/
+                viewModelScope.launch {
+                    profileDataSource.profile.first()?.let { savedProfile ->
+                        _state.update { it.copy(
+                            selectedGender = savedProfile.gender,
+                            selectedHeightType = when (savedProfile.heightUnit) {
+                                HeightUnit.CM -> SmartStepHeightType.CM(selectedValue = savedProfile.heightCm)
+                                HeightUnit.FT_IN -> {
+                                    val totalInches = (savedProfile.heightCm / 2.54).roundToInt()
+                                    SmartStepHeightType.FtInch(
+                                        selectedFt = totalInches / 12,
+                                        selectedInch = totalInches % 12
+                                    )
+                                }
+                            },
+                            selectedWeightType = when (savedProfile.weightUnit) {
+                                WeightUnit.KG -> SmartStepWeightType.KG(selectedKg = savedProfile.weightKg)
+                                WeightUnit.LBS -> SmartStepWeightType.LBS(
+                                    selectedLbs = (savedProfile.weightKg / 0.453592).roundToInt()
+                                )
+                            }
+                        ) }
+                    }
+                }
                 hasLoadedInitialData = true
             }
         }
@@ -38,6 +69,51 @@ class ProfileSetupViewModel : ViewModel() {
             is ProfileSetupAction.OnChangeWeightType -> onChangeWeightType(action.weightType)
             ProfileSetupAction.OnClickWeightType -> onClickWeightType()
             ProfileSetupAction.OnDismissWeightTypeMenu -> onDismissWeightTypeMenu()
+            ProfileSetupAction.OnStartClick -> onStartClick()
+            ProfileSetupAction.OnSkip -> onSkip()
+        }
+    }
+
+    private fun onSkip() {
+        viewModelScope.launch {
+            profileDataSource.saveIsSetupVisited(true)
+        }
+    }
+
+    private fun onStartClick() {
+        val currentState = _state.value
+        val heightCm = when (val height = currentState.selectedHeightType) {
+            is SmartStepHeightType.CM -> height.selectedValue
+            is SmartStepHeightType.FtInch -> {
+                val totalInches = height.selectedFt * 12 + height.selectedInch
+                (totalInches * 2.54).roundToInt()
+            }
+        }
+
+        val weightKg = when (val weight = currentState.selectedWeightType) {
+            is SmartStepWeightType.KG -> weight.selectedKg
+            is SmartStepWeightType.LBS -> (weight.selectedLbs * 0.453592).roundToInt()
+        }
+
+        val heightUnit = when (currentState.selectedHeightType) {
+            is SmartStepHeightType.CM -> HeightUnit.CM
+            is SmartStepHeightType.FtInch -> HeightUnit.FT_IN
+        }
+        val weightUnit = when (currentState.selectedWeightType) {
+            is SmartStepWeightType.KG -> WeightUnit.KG
+            is SmartStepWeightType.LBS -> WeightUnit.LBS
+        }
+
+        val profile = Profile(
+            gender = currentState.selectedGender,
+            heightCm = heightCm,
+            weightKg = weightKg,
+            heightUnit = heightUnit,
+            weightUnit = weightUnit
+        )
+
+        viewModelScope.launch {
+            profileDataSource.saveProfile(profile)
         }
     }
 
