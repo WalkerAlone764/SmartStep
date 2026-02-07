@@ -14,7 +14,7 @@ class MainViewModel(
     private val profileDataSource: ProfileDataSource
 ): ViewModel() {
 
-    private val _state = MutableStateFlow<MainState>(MainState())
+    private val _state = MutableStateFlow(MainState())
     val state = _state
         .combine(profileDataSource.isSetupVisited) { state, isSetupVisited ->
             Log.d("isSetup", isSetupVisited.toString())

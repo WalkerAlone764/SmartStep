@@ -19,4 +19,6 @@
     <string name="male">Male</string>
     <string name="female">Female</string>
     <string name="inch">inch</string>
+    <string name="steps_count_format">/%1$d Steps</string>
+    <string name="smart_step">Smart Step</string>
 </resources>

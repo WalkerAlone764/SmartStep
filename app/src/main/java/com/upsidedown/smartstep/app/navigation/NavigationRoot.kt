@@ -10,6 +10,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.upsidedown.smartstep.home.presentation.step_counter.StepCounterRoot
 import com.upsidedown.smartstep.profile.presentation.setup.presentation.ProfileSetupRoot
 
 @Composable
@@ -33,12 +34,7 @@ fun NavigationRoot(
             }
 
             entry<Routes.Home> {
-                Text(
-                    text = "Home",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .wrapContentSize()
-                )
+                StepCounterRoot()
             }
 
         }
