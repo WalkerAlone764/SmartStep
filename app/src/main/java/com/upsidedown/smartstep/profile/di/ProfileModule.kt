@@ -7,7 +7,7 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val profileModule = module {
-    factory<ProfileDataSource> { DataStoreProfileDataSource(get()) }
+    single<ProfileDataSource> { DataStoreProfileDataSource(get()) }
 
     viewModelOf(::ProfileSetupViewModel)
 }

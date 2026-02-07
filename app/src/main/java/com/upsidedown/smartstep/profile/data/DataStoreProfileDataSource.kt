@@ -65,6 +65,7 @@ class DataStoreProfileDataSource(
             preferences[WEIGHT_KG] = profile.weightKg
             preferences[HEIGHT_UNIT] = profile.heightUnit.name
             preferences[WEIGHT_UNIT] = profile.weightUnit.name
+            preferences[IS_SETUP_VISITED] = true
         }
     }
 
