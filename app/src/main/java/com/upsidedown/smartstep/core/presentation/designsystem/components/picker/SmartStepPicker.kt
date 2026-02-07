@@ -69,7 +69,7 @@ fun SmartStepPickerCard(
             .widthIn(
                 max = 328.dp
             )
-            .width(280.dp),
+            .fillMaxWidth(),
         shape = RoundedCornerShape(28.dp),
         color = MaterialTheme.colorScheme.surfaceContainer,
         shadowElevation = 0.dp
@@ -125,7 +125,6 @@ fun SmartStepPickerCard(
                     onClick = onCancel,
                     style = SmartStepButtonStyle.TEXT
                 )
-                Spacer(modifier = Modifier.width(8.dp))
                 SmartStepButton(
                     text = stringResource(R.string.ok),
                     onClick = onOk,
@@ -243,45 +242,52 @@ fun VerticalNumberPicker(
 sealed class SmartStepHeightType(
     val title: UiText
 ) {
-    data class CM(val selectedValue: Int = 175): SmartStepHeightType(UiText.StringResource(R.string.cm))
-    data class FtInch(val selectedFt: Int = 5, val selectedInch: Int = 9): SmartStepHeightType(UiText.StringResource(R.string.ft_in))
+    data class CM(val selectedValue: Int = 175, val unit: UiText = UiText.StringResource(R.string.cm)): SmartStepHeightType(UiText.StringResource(R.string.cm))
+    data class FtInch(val selectedFt: Int = 5, val unitFt: UiText = UiText.StringResource(R.string.ft), val selectedInch: Int = 9, val unitInch: UiText = UiText.StringResource(R.string.inch)): SmartStepHeightType(UiText.StringResource(R.string.ft_in))
 }
 
 @Composable
 fun SmartStepHeightPicker(
     selectedType: SmartStepHeightType,
-    onChange: (type: SmartStepHeightType) -> Unit,
+    onDismiss: () -> Unit,
+    onConfirm: (type: SmartStepHeightType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var internalState by remember(selectedType) { mutableStateOf(selectedType) }
 
     SmartStepPickerCard(
         title = stringResource(R.string.height),
         subtitle = stringResource(R.string.used_to_calculate_distance),
         modifier = modifier,
+        onCancel = onDismiss,
+        onOk = {
+            onConfirm(internalState)
+            onDismiss()
+        },
         unitSelector = {
             Row(modifier = Modifier.fillMaxWidth()) {
                 SmartStepChip(
                     text = stringResource(R.string.cm),
-                    isSelected = selectedType is SmartStepHeightType.CM,
+                    isSelected = internalState is SmartStepHeightType.CM,
                     style = SmartStepChipStyle.LEFT,
                     onClick = {
-                        onChange(SmartStepHeightType.CM())
+                        internalState = SmartStepHeightType.CM()
                     },
                     modifier = Modifier.weight(1f)
                 )
                 SmartStepChip(
                     text = stringResource(R.string.ft_in),
-                    isSelected = selectedType is SmartStepHeightType.FtInch,
+                    isSelected = internalState is SmartStepHeightType.FtInch,
                     style = SmartStepChipStyle.RIGHT,
                     onClick = {
-                        onChange(SmartStepHeightType.FtInch())
+                        internalState = SmartStepHeightType.FtInch()
                     },
                     modifier = Modifier.weight(1f)
                 )
             }
         },
         pickerContent = {
-            val typeKey = when (selectedType) {
+            val typeKey = when (internalState) {
                 is SmartStepHeightType.CM -> 0
                 is SmartStepHeightType.FtInch -> 1
             }
@@ -295,26 +301,26 @@ fun SmartStepHeightPicker(
             ) { targetTypeKey ->
                 when (targetTypeKey) {
                     0 -> {
-                        val cmValue = (selectedType as? SmartStepHeightType.CM)?.selectedValue ?: 175
+                        val cmValue = (internalState as? SmartStepHeightType.CM)?.selectedValue ?: 175
                         VerticalNumberPicker(
                             range = 100..250,
                             selectedValue = cmValue,
                             onValueChange = {
-                                onChange(SmartStepHeightType.CM(it))
+                                internalState = SmartStepHeightType.CM(it)
                             },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
                     1 -> {
-                        val ftValue = (selectedType as? SmartStepHeightType.FtInch)?.selectedFt ?: 5
-                        val inValue = (selectedType as? SmartStepHeightType.FtInch)?.selectedInch ?: 9
+                        val ftValue = (internalState as? SmartStepHeightType.FtInch)?.selectedFt ?: 5
+                        val inValue = (internalState as? SmartStepHeightType.FtInch)?.selectedInch ?: 9
                         Row(modifier = Modifier.fillMaxWidth()) {
                             key("ft") {
                                 VerticalNumberPicker(
                                     range = 1..8,
                                     selectedValue = ftValue,
                                     onValueChange = {
-                                        onChange(SmartStepHeightType.FtInch(it, inValue))
+                                        internalState = SmartStepHeightType.FtInch(it, selectedInch = inValue)
                                     },
                                     modifier = Modifier.weight(1f),
                                     unit = stringResource(R.string.ft)
@@ -325,7 +331,7 @@ fun SmartStepHeightPicker(
                                     range = 0..11,
                                     selectedValue = inValue,
                                     onValueChange = {
-                                        onChange(SmartStepHeightType.FtInch(ftValue, it))
+                                        internalState = SmartStepHeightType.FtInch(ftValue, selectedInch = it)
                                     },
                                     modifier = Modifier.weight(1f),
                                     unit = stringResource(R.string.in_unit)
@@ -342,45 +348,52 @@ fun SmartStepHeightPicker(
 sealed class SmartStepWeightType(
     val title: UiText
 ) {
-    data class KG(val selectedKg: Int = 65): SmartStepWeightType(UiText.StringResource(R.string.kg))
-    data class LBS(val selectedLbs: Int = 143): SmartStepWeightType(UiText.StringResource(R.string.lbs))
+    data class KG(val selectedKg: Int = 65, val unit: UiText = UiText.StringResource(R.string.kg)): SmartStepWeightType(UiText.StringResource(R.string.kg))
+    data class LBS(val selectedLbs: Int = 143, val unit: UiText = UiText.StringResource(R.string.lbs)): SmartStepWeightType(UiText.StringResource(R.string.lbs))
 }
 
 @Composable
 fun SmartStepWeightPicker(
     selectedType: SmartStepWeightType,
-    onChange: (type: SmartStepWeightType) -> Unit,
+    onDismiss: () -> Unit,
+    onConfirm: (type: SmartStepWeightType) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var internalState by remember(selectedType) { mutableStateOf(selectedType) }
 
     SmartStepPickerCard(
         title = stringResource(R.string.weight),
         subtitle = stringResource(R.string.used_to_calculate_calories),
         modifier = modifier,
+        onCancel = onDismiss,
+        onOk = {
+            onConfirm(internalState)
+            onDismiss()
+        },
         unitSelector = {
             Row(modifier = Modifier.fillMaxWidth()) {
                 SmartStepChip(
                     text = stringResource(R.string.kg),
-                    isSelected = selectedType is SmartStepWeightType.KG,
+                    isSelected = internalState is SmartStepWeightType.KG,
                     style = SmartStepChipStyle.LEFT,
                     onClick = {
-                        onChange(SmartStepWeightType.KG())
+                        internalState = SmartStepWeightType.KG()
                     },
                     modifier = Modifier.weight(1f)
                 )
                 SmartStepChip(
                     text = stringResource(R.string.lbs),
-                    isSelected = selectedType is SmartStepWeightType.LBS,
+                    isSelected = internalState is SmartStepWeightType.LBS,
                     style = SmartStepChipStyle.RIGHT,
                     onClick = {
-                        onChange(SmartStepWeightType.LBS())
+                        internalState = SmartStepWeightType.LBS()
                     },
                     modifier = Modifier.weight(1f)
                 )
             }
         },
         pickerContent = {
-            val typeKey = when (selectedType) {
+            val typeKey = when (internalState) {
                 is SmartStepWeightType.KG -> 0
                 is SmartStepWeightType.LBS -> 1
             }
@@ -394,25 +407,25 @@ fun SmartStepWeightPicker(
             ) { targetTypeKey ->
                 when (targetTypeKey) {
                     0 -> {
-                        val kgValue = (selectedType as? SmartStepWeightType.KG)?.selectedKg ?: 65
+                        val kgValue = (internalState as? SmartStepWeightType.KG)?.selectedKg ?: 65
                         VerticalNumberPicker(
                             range = 30..200,
                             selectedValue = kgValue,
                             unit = stringResource(R.string.kg),
                             onValueChange = {
-                                onChange(SmartStepWeightType.KG(it))
+                                internalState = SmartStepWeightType.KG(it)
                             },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
                     1 -> {
-                        val lbsValue = (selectedType as? SmartStepWeightType.LBS)?.selectedLbs ?: 143
+                        val lbsValue = (internalState as? SmartStepWeightType.LBS)?.selectedLbs ?: 143
                         VerticalNumberPicker(
                             range = 70..450,
                             selectedValue = lbsValue,
                             unit = stringResource(R.string.lbs),
                             onValueChange = {
-                                onChange(SmartStepWeightType.LBS(it))
+                                internalState = SmartStepWeightType.LBS(it)
                             },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -433,7 +446,8 @@ private fun HeightPickerCmPreview() {
         Box(modifier = Modifier.padding(16.dp)) {
             SmartStepHeightPicker(
                 selectedType = selectedHeightType,
-                onChange = {
+                onDismiss = {},
+                onConfirm = {
                     selectedHeightType = it
                 },
             )
@@ -451,7 +465,8 @@ private fun WeightPickerPreview() {
         Box(modifier = Modifier.padding(16.dp)) {
             SmartStepWeightPicker(
                 selectedType = selectedWeightType,
-                onChange = {
+                onDismiss = {},
+                onConfirm = {
                     selectedWeightType = it
                 },
             )
@@ -475,7 +490,8 @@ private fun PickerComparisonPreview() {
         ) {
             SmartStepHeightPicker(
                 selectedType = selectedHeightType,
-                onChange = {
+                onDismiss = {},
+                onConfirm = {
                     selectedHeightType = it
                 },
                 modifier = Modifier
@@ -485,7 +501,8 @@ private fun PickerComparisonPreview() {
             )
             SmartStepWeightPicker(
                 selectedType = selectedWeightType,
-                onChange = {
+                onDismiss = {},
+                onConfirm = {
                     selectedWeightType = it
                 },
                 modifier = Modifier

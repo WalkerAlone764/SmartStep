@@ -26,30 +26,16 @@ import com.upsidedown.smartstep.core.presentation.designsystem.components.SmartS
 import com.upsidedown.smartstep.core.presentation.designsystem.components.picker.SmartStepHeightPicker
 import com.upsidedown.smartstep.core.presentation.designsystem.components.picker.SmartStepHeightType
 import com.upsidedown.smartstep.core.presentation.designsystem.theme.SmartStepTheme
+import com.upsidedown.smartstep.profile.presentation.setup.presentation.ProfileSetupRoot
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val splashScreen = installSplashScreen()
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             SmartStepTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
-                    var selectedGender by remember { mutableStateOf("Female",) }
-                    Box(modifier = Modifier
-                        .background(Color.White)
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                        .padding(16.dp)) {
-                        SmartStepDropdown(
-                            label = "Gender",
-                            selectedValue = selectedGender,
-                            options = listOf("Female", "Male", "Other"),
-                            onOptionSelected = { selectedGender = it }
-                        )
-                    }
-                }
+                    ProfileSetupRoot()
             }
         }
     }

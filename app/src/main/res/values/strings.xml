@@ -14,4 +14,9 @@
     <string name="cancel">Cancel</string>
     <string name="ft">ft</string>
     <string name="in_unit">in</string>
+    <string name="my_profile">My profile</string>
+    <string name="skip">Skip</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="inch">inch</string>
 </resources>

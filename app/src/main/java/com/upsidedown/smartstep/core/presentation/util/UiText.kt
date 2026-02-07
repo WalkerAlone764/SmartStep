@@ -23,7 +23,7 @@ sealed interface UiText {
         }
     }
 
-    suspend fun asStringAsync(context: Context): String {
+    fun asString(context: Context): String {
         return when(this) {
             is DynamicString -> value
             is StringResource -> context.getString(
