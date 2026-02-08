@@ -6,6 +6,7 @@ import java.util.Locale
 data class StepCounterState(
     val currentSteps: Int = 4563,
     val goalSteps: Int = 6000,
+    val isExitDialogShown: Boolean = false,
 ) {
     val formattedCurrentSteps: String
         get() = NumberFormat.getNumberInstance(Locale.US).format(currentSteps)

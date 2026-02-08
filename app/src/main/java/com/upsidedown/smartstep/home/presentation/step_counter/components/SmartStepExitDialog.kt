@@ -1,4 +1,4 @@
-package com.upsidedown.smartstep.core.presentation.designsystem.components
+package com.upsidedown.smartstep.home.presentation.step_counter.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -79,12 +79,7 @@ fun SmartStepExitDialogContent(
 @Composable
 private fun SmartStepExitDialogPreview() {
     SmartStepTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.LightGray),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+
             SmartStepExitDialogContent(
                 onConfirm = {},
                 topIcon = {
@@ -104,5 +99,5 @@ private fun SmartStepExitDialogPreview() {
                 }
             )
         }
-    }
+
 }
