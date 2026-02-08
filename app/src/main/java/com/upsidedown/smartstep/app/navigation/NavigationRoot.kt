@@ -2,7 +2,9 @@ package com.upsidedown.smartstep.app.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -19,25 +21,25 @@ fun NavigationRoot(
     modifier: Modifier = Modifier
 ) {
     val backStack = rememberNavBackStack(startRoutes)
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+        NavDisplay(
+            modifier = modifier,
+            backStack = backStack,
+            entryDecorators = listOf(
+                rememberSaveableStateHolderNavEntryDecorator(),
+                rememberViewModelStoreNavEntryDecorator()
+            ),
+            entryProvider = entryProvider {
 
-    NavDisplay(
-        modifier = modifier,
-        backStack = backStack,
-        entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator()
-        ),
-        entryProvider = entryProvider {
+                entry<Routes.ProfileSetup> {
+                    ProfileSetupRoot()
+                }
 
-            entry<Routes.ProfileSetup> {
-                ProfileSetupRoot()
+                entry<Routes.Home> {
+                    StepCounterRoot()
+                }
+
             }
 
-            entry<Routes.Home> {
-                StepCounterRoot()
-            }
-
-        }
-    )
-
+        )
 }

@@ -38,7 +38,8 @@ import java.util.Locale
 
 @Composable
 fun StepCounterCard(
-    currentSteps: String,
+    currentSteps: Int,
+    formattedCurrentSteps: String,
     goalSteps: Int,
     modifier: Modifier = Modifier
 ) {
@@ -79,7 +80,7 @@ fun StepCounterCard(
 
             Column {
                 Text(
-                    text = currentSteps,
+                    text = formattedCurrentSteps,
                     fontSize = 64.sp,
                     fontWeight = FontWeight.Bold,
                     lineHeight = 64.sp,
@@ -120,7 +121,8 @@ private fun StepCounterCardPreview() {
     SmartStepTheme {
         Box(modifier = Modifier.padding(16.dp)) {
             StepCounterCard(
-                currentSteps = "4,523",
+                currentSteps = 4523,
+                formattedCurrentSteps = "4,523",
                 goalSteps = 6000
             )
         }

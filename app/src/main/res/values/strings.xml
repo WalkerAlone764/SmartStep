@@ -21,4 +21,7 @@
     <string name="inch">inch</string>
     <string name="steps_count_format">/%1$d Steps</string>
     <string name="smart_step">Smart Step</string>
+    <string name="step_goal">Step Goal</string>
+    <string name="personal_settings">Personal Settings</string>
+    <string name="exit">Exit</string>
 </resources>
