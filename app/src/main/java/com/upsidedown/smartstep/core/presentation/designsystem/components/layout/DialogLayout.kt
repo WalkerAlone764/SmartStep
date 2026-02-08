@@ -71,6 +71,9 @@ private fun BottomSheetStyleContent(
     ) {
         Column(
             modifier = Modifier
+                .widthIn(
+                    max = 328.dp
+                )
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(
                     topStart = 28.dp,
