@@ -53,7 +53,9 @@ fun ProfileSetupScreen(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             ProfileSetupTopBar(
-                onSkipClick = {}
+                onSkipClick = {
+                    onAction(ProfileSetupAction.OnSkip)
+                }
             )
         }
     ) { innerPadding ->
