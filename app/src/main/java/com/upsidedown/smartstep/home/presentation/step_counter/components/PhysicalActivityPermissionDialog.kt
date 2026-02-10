@@ -2,6 +2,7 @@ package com.upsidedown.smartstep.home.presentation.step_counter.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,11 +28,12 @@ fun PhysicalActivityPermissionDialog(
     modifier: Modifier = Modifier
 ) {
     DialogLayout(
-        modifier = modifier,
+        modifier = Modifier
+            .fillMaxSize(),
         onDismiss = onDismiss
     ) {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

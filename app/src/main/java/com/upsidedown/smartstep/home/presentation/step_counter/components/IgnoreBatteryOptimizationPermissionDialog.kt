@@ -1,6 +1,7 @@
 package com.upsidedown.smartstep.home.presentation.step_counter.components
 
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
@@ -16,14 +17,15 @@ import com.upsidedown.smartstep.core.presentation.designsystem.components.layout
 import com.upsidedown.smartstep.core.presentation.designsystem.theme.SmartStepTheme
 
 @Composable
-fun BackgroundLocationPermissionDialog(
+fun IgnoreBatteryOptimizationPermissionDialog(
     onDismiss: () -> Unit,
     onClickAllow: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     DialogLayout(
         onDismiss = onDismiss,
-        modifier = modifier
+        modifier = Modifier
+            .fillMaxSize()
     ) {
         Spacer(modifier = Modifier.height(8.dp))
         Text(
@@ -53,7 +55,7 @@ fun BackgroundLocationPermissionDialog(
 @Composable
 private fun Preview() {
     SmartStepTheme {
-        BackgroundLocationPermissionDialog(
+        IgnoreBatteryOptimizationPermissionDialog(
             onDismiss = {},
             onClickAllow = {}
         )
