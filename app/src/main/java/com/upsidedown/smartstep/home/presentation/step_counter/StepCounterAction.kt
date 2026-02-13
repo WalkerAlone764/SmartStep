@@ -24,5 +24,13 @@ sealed interface StepCounterAction {
     data object OnDismissIgnoreBatteryOptimizationDialog: StepCounterAction
     data object OnClickAllowIgnoreBatteryOptimization: StepCounterAction
 
+    data object OnClickFixStopCountingStep : StepCounterAction
+
+    data object OnClickStepGoalMenu: StepCounterAction
+
+    data object OnDismissStepGoalSelectionDialog : StepCounterAction
+
+    data class OnSaveStepGoal(val stepGoal: Int) : StepCounterAction
+
 
 }

@@ -11,7 +11,8 @@ data class StepCounterState(
     val hasIgnoreBatteryOptimizationPermission: Boolean = false,
     val isActivityRecognitionPermissionRationaleDialogShown: Boolean = false,
     val isActivityRecognitionPermissionSettingDialogShown: Boolean = false,
-    val isIgnoreBatteryOptimizationDialogShown: Boolean = false
+    val isIgnoreBatteryOptimizationDialogShown: Boolean = false,
+    val isStepGoalSelectionDialogShown: Boolean = false
 ) {
     val formattedCurrentSteps: String
         get() = NumberFormat.getNumberInstance(Locale.US).format(currentSteps)

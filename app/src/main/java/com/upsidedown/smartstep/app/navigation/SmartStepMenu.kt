@@ -1,5 +1,6 @@
 package com.upsidedown.smartstep.app.navigation
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -26,7 +27,9 @@ import com.upsidedown.smartstep.core.presentation.designsystem.theme.SmartStepTh
 
 @Composable
 fun SmartStepMenu(
+    shouldShowStepCountingIssue: Boolean,
     drawerState: DrawerState,
+    onFixStopCountingStep: () -> Unit,
     onStepGoalClick: () -> Unit,
     onPersonalSettingsClick: () -> Unit,
     onExitClick: () -> Unit,
@@ -46,6 +49,17 @@ fun SmartStepMenu(
                         .fillMaxHeight()
                         .padding(vertical = 16.dp)
                 ) {
+                   AnimatedVisibility(shouldShowStepCountingIssue) {
+                       SmartStepMenuItem(
+                           text = stringResource(id = R.string.fix_stop_counting_steps),
+                           onClick = onFixStopCountingStep
+                       )
+                       HorizontalDivider(
+                           modifier = Modifier.padding(horizontal = 16.dp),
+                           thickness = 1.dp,
+                           color = MaterialTheme.colorScheme.outline
+                       )
+                   }
                     SmartStepMenuItem(
                         text = stringResource(id = R.string.step_goal),
                         onClick = onStepGoalClick
@@ -100,9 +114,11 @@ private fun SmartStepMenuItem(
 private fun SmartStepMenuPreview() {
     SmartStepTheme {
         SmartStepMenu(
+            shouldShowStepCountingIssue = true,
             drawerState = rememberDrawerState(
                 initialValue = DrawerValue.Open
             ),
+            onFixStopCountingStep = {},
             onStepGoalClick = {},
             onPersonalSettingsClick = {},
             onExitClick = {}

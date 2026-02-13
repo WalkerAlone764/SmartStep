@@ -30,4 +30,6 @@
     <string name="step_tap_physical_activity">2. Tap Physical activity</string>
     <string name="step_select_allow">3. Select Allow</string>
     <string name="open_settings">Open settings</string>
+    <string name="fix_stop_counting_steps">Fix the “Stop Counting Steps” issue</string>
+    <string name="save">Save</string>
 </resources>

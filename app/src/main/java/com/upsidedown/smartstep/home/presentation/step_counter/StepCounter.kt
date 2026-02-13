@@ -34,7 +34,6 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -46,6 +45,7 @@ import com.upsidedown.smartstep.home.presentation.step_counter.StepCounterAction
 import com.upsidedown.smartstep.home.presentation.step_counter.components.IgnoreBatteryOptimizationPermissionDialog
 import com.upsidedown.smartstep.home.presentation.step_counter.components.MotionSenorDialog
 import com.upsidedown.smartstep.home.presentation.step_counter.components.PhysicalActivityPermissionDialog
+import com.upsidedown.smartstep.home.presentation.step_counter.components.SelectStepGoalDialog
 import com.upsidedown.smartstep.home.presentation.step_counter.components.SmartStepExitDialog
 import com.upsidedown.smartstep.home.presentation.step_counter.components.StepCounterCard
 import com.upsidedown.smartstep.home.presentation.step_counter.components.StepCounterTopAppBar
@@ -161,8 +161,20 @@ fun StepCounterScreen(
     val scope = rememberCoroutineScope()
 
     SmartStepMenu(
+        shouldShowStepCountingIssue = !state.hasIgnoreBatteryOptimizationPermission,
         drawerState = drawerState,
-        onStepGoalClick = { },
+        onFixStopCountingStep = {
+            scope.launch {
+                drawerState.close()
+                onAction(StepCounterAction.OnClickFixStopCountingStep)
+            }
+        },
+        onStepGoalClick = {
+            scope.launch {
+                drawerState.close()
+                onAction(StepCounterAction.OnClickStepGoalMenu)
+            }
+        },
         onPersonalSettingsClick = { },
         onExitClick = {
             onAction(StepCounterAction.OnClickExit)
@@ -223,7 +235,6 @@ fun StepCounterScreen(
     if (state.isActivityRecognitionPermissionRationaleDialogShown) {
         MotionSenorDialog(
             onDismiss = {
-//                onAction(StepCounterAction.OnDismissMotionSensorDialog)
             },
             onClickAllow = {
                 onAction(StepCounterAction.OnClickAllowPhysicalActivity)
@@ -234,7 +245,6 @@ fun StepCounterScreen(
     if (state.isActivityRecognitionPermissionSettingDialogShown) {
         PhysicalActivityPermissionDialog(
             onDismiss = {
-//                onAction(StepCounterAction.OnDismissPhysicalActivityDialog)
             },
             onClickOpenSettings = {
                 onAction(StepCounterAction.OnClickOpenSettings)
@@ -250,6 +260,18 @@ fun StepCounterScreen(
             },
             onClickAllow = {
                 onAction(StepCounterAction.OnClickAllowIgnoreBatteryOptimization)
+            }
+        )
+    }
+
+    if (state.isStepGoalSelectionDialogShown) {
+        SelectStepGoalDialog(
+            initialValue = state.goalSteps,
+            onDismiss = {
+                onAction(StepCounterAction.OnDismissStepGoalSelectionDialog)
+            },
+            onSave = {
+                onAction(StepCounterAction.OnSaveStepGoal(it))
             }
         )
     }

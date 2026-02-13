@@ -50,7 +50,30 @@ class StepCounterViewModel : ViewModel() {
             StepCounterAction.OnClickAllowIgnoreBatteryOptimization -> onClickAllowIgnoreBatteryOptimization()
             StepCounterAction.OnDismissIgnoreBatteryOptimizationDialog -> onDismissIgnoreBatteryOptimizationDialog()
             StepCounterAction.OnResume -> onResume()
+            StepCounterAction.OnClickFixStopCountingStep -> onClickFixStopCountingStep()
+            StepCounterAction.OnClickStepGoalMenu -> onClickStepGoalMenu()
+            StepCounterAction.OnDismissStepGoalSelectionDialog -> onDismissStepGoalSelectionDialog()
+            is StepCounterAction.OnSaveStepGoal -> onSaveStepGoal(action.stepGoal)
         }
+    }
+
+    private fun onSaveStepGoal(stepGoal: Int) {
+        _state.update { it.copy(
+            goalSteps = stepGoal,
+            isStepGoalSelectionDialogShown = false,
+        ) }
+    }
+
+    private fun onDismissStepGoalSelectionDialog() {
+        _state.update { it.copy(isStepGoalSelectionDialogShown = false) }
+    }
+
+    private fun onClickStepGoalMenu() {
+        _state.update { it.copy(isStepGoalSelectionDialogShown = true) }
+    }
+
+    private fun onClickFixStopCountingStep() {
+        _state.update { it.copy(isIgnoreBatteryOptimizationDialogShown = true) }
     }
 
     private fun onResume() {
