@@ -1,4 +1,4 @@
-package com.upsidedown.smartstep.profile.presentation.setup.presentation.component
+package com.upsidedown.smartstep.profile.presentation.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable

@@ -1,4 +1,4 @@
-package com.upsidedown.smartstep.profile.presentation.setup.presentation.component
+package com.upsidedown.smartstep.profile.presentation.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

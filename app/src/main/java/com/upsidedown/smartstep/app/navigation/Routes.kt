@@ -11,4 +11,6 @@ sealed interface Routes: NavKey {
 
     @Serializable
     data object Home: Routes
+    @Serializable
+    data object PersonalSetting: Routes
 }

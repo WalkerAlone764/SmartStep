@@ -36,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -253,7 +254,7 @@ fun SmartStepHeightPicker(
     onConfirm: (type: SmartStepHeightType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var internalState by remember(selectedType) { mutableStateOf(selectedType) }
+    var internalState by retain(selectedType) { mutableStateOf(selectedType) }
 
     SmartStepPickerCard(
         title = stringResource(R.string.height),
@@ -359,7 +360,7 @@ fun SmartStepWeightPicker(
     onConfirm: (type: SmartStepWeightType) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var internalState by remember(selectedType) { mutableStateOf(selectedType) }
+    var internalState by retain(selectedType) { mutableStateOf(selectedType) }
 
     SmartStepPickerCard(
         title = stringResource(R.string.weight),

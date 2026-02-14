@@ -13,6 +13,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.upsidedown.smartstep.home.presentation.step_counter.StepCounterRoot
+import com.upsidedown.smartstep.profile.presentation.setting.presentation.PersonalSettingRoot
 import com.upsidedown.smartstep.profile.presentation.setup.presentation.ProfileSetupRoot
 
 @Composable
@@ -21,7 +22,6 @@ fun NavigationRoot(
     modifier: Modifier = Modifier
 ) {
     val backStack = rememberNavBackStack(startRoutes)
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
         NavDisplay(
             modifier = modifier,
             backStack = backStack,
@@ -36,7 +36,19 @@ fun NavigationRoot(
                 }
 
                 entry<Routes.Home> {
-                    StepCounterRoot()
+                    StepCounterRoot(
+                        onClickPersonalSetting = {
+                            backStack.add(Routes.PersonalSetting)
+                        }
+                    )
+                }
+
+                entry<Routes.PersonalSetting> {
+                    PersonalSettingRoot(
+                        onSuccessfullySave = {
+                            backStack.removeAt(backStack.lastIndex)
+                        }
+                    )
                 }
 
             }

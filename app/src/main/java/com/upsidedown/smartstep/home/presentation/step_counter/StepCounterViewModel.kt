@@ -54,6 +54,7 @@ class StepCounterViewModel : ViewModel() {
             StepCounterAction.OnClickStepGoalMenu -> onClickStepGoalMenu()
             StepCounterAction.OnDismissStepGoalSelectionDialog -> onDismissStepGoalSelectionDialog()
             is StepCounterAction.OnSaveStepGoal -> onSaveStepGoal(action.stepGoal)
+            StepCounterAction.OnClickPersonalSettingMenu -> Unit
         }
     }
 

@@ -26,10 +26,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.upsidedown.smartstep.core.presentation.designsystem.components.button.SmartStepButton
 import com.upsidedown.smartstep.core.presentation.designsystem.theme.SmartStepTheme
-import com.upsidedown.smartstep.profile.presentation.setup.presentation.component.GenderOptionComponent
-import com.upsidedown.smartstep.profile.presentation.setup.presentation.component.HeightOptionComponent
+import com.upsidedown.smartstep.profile.presentation.components.GenderOptionComponent
+import com.upsidedown.smartstep.profile.presentation.components.HeightOptionComponent
 import com.upsidedown.smartstep.profile.presentation.setup.presentation.component.ProfileSetupTopBar
-import com.upsidedown.smartstep.profile.presentation.setup.presentation.component.WeightOptionComponent
+import com.upsidedown.smartstep.profile.presentation.components.WeightOptionComponent
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

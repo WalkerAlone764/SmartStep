@@ -53,6 +53,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun StepCounterRoot(
+    onClickPersonalSetting: () -> Unit,
     viewModel: StepCounterViewModel = viewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -148,7 +149,15 @@ fun StepCounterRoot(
 
     StepCounterScreen(
         state = state,
-        onAction = viewModel::onAction
+        onAction = { action ->
+            when(action) {
+                StepCounterAction.OnClickPersonalSettingMenu -> {
+                    onClickPersonalSetting()
+                }
+                else -> viewModel.onAction(action)
+            }
+
+        }
     )
 }
 
@@ -175,7 +184,12 @@ fun StepCounterScreen(
                 onAction(StepCounterAction.OnClickStepGoalMenu)
             }
         },
-        onPersonalSettingsClick = { },
+        onPersonalSettingsClick = {
+            scope.launch {
+                drawerState.close()
+                onAction(StepCounterAction.OnClickPersonalSettingMenu)
+            }
+        },
         onExitClick = {
             onAction(StepCounterAction.OnClickExit)
             scope.launch {
