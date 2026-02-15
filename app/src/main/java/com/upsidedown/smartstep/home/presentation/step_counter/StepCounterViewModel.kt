@@ -9,8 +9,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -42,8 +40,6 @@ class StepCounterViewModel(
                 /** Load initial data here **/
                 hasLoadedInitialData = true
             }
-
-//            _event.send(StepCounterEvent.CheckAllPermission)
         }
         .stateIn(
             scope = viewModelScope,
@@ -54,7 +50,7 @@ class StepCounterViewModel(
     init {
 
         viewModelScope.launch {
-            stepDataSource.listenStep()
+            stepDataSource.listenSteps()
         }
     }
 

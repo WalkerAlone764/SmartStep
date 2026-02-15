@@ -3,27 +3,19 @@ package com.upsidedown.smartstep.home.data
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import com.upsidedown.smartstep.R
-import com.upsidedown.smartstep.core.database.data.dao.StepDao
 import com.upsidedown.smartstep.home.domain.StepDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-import java.time.LocalDate
 
 class StepCounterService : Service() {
-
     private val stepDataSource: StepDataSource by inject()
-    private val stepDao: StepDao by inject()
-    
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -48,7 +40,7 @@ class StepCounterService : Service() {
         startForeground(1, notification)
 
         serviceScope.launch {
-            stepDataSource.listenStep()
+            stepDataSource.listenSteps()
         }
     }
 

@@ -1,6 +1,5 @@
 package com.upsidedown.smartstep.core.database.data.dao
 
-import android.util.Log
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -18,14 +17,9 @@ interface StepDao {
     @Query("SELECT * FROM steps WHERE date = :date")
     suspend fun getStepByDate(date: LocalDate): StepEntity?
 
-    @Query("UPDATE steps SET count = count + :amount WHERE date = :date")
-    suspend fun updateStepCount(date: LocalDate, amount: Int): Int
-
     @Transaction
     suspend fun increaseStepCount(date: LocalDate, amount: Int) {
         val stepEntity = getStepByDate(date)
-
-        Log.d("stepEntity", stepEntity.toString())
         upsertStep(
             StepEntity(
                 date = date,
