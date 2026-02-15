@@ -1,22 +1,42 @@
 package com.upsidedown.smartstep.home.presentation.step_counter
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.upsidedown.smartstep.home.domain.StepDataSource
+import com.upsidedown.smartstep.home.domain.StepRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
-class StepCounterViewModel : ViewModel() {
+class StepCounterViewModel(
+    private val stepRepository: StepRepository,
+    private val stepDataSource: StepDataSource
+) : ViewModel() {
 
     private var hasLoadedInitialData = false
 
     private val _state = MutableStateFlow(StepCounterState())
+    private val _steps = stepRepository
+        .getAllStepsByDate(LocalDate.now())
+
+
     val state = _state
+        .combine(_steps) { state, steps ->
+            Log.d("viewmodel steps", steps.toString())
+            state.copy(
+                currentSteps = steps.sumOf { it.count },
+            )
+        }
         .onStart {
             if (!hasLoadedInitialData) {
                 /** Load initial data here **/
@@ -31,8 +51,16 @@ class StepCounterViewModel : ViewModel() {
             initialValue = StepCounterState()
         )
 
+    init {
+
+        viewModelScope.launch {
+            stepDataSource.listenStep()
+        }
+    }
+
     private val _event = Channel<StepCounterEvent>()
     val event = _event.receiveAsFlow()
+
 
     fun onAction(action: StepCounterAction) {
         when (action) {

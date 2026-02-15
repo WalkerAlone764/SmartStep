@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -11,6 +12,8 @@ android {
             minorApiLevel = 1
         }
     }
+
+
 
     defaultConfig {
         applicationId = "com.upsidedown.smartstep"
@@ -70,4 +73,8 @@ dependencies {
 
     //datastore
     implementation(libs.androidx.datastore.preferences)
+
+    //room
+    implementation(libs.bundles.room)
+    ksp(libs.androidx.room.compiler)
 }

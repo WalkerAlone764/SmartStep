@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
 import android.util.Log
@@ -32,15 +33,16 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.upsidedown.smartstep.R
 import com.upsidedown.smartstep.app.navigation.SmartStepMenu
 import com.upsidedown.smartstep.core.presentation.designsystem.theme.SmartStepTheme
 import com.upsidedown.smartstep.core.presentation.util.ObserveAsEvents
+import com.upsidedown.smartstep.home.data.StepCounterService
 import com.upsidedown.smartstep.home.presentation.step_counter.StepCounterAction.*
 import com.upsidedown.smartstep.home.presentation.step_counter.components.IgnoreBatteryOptimizationPermissionDialog
 import com.upsidedown.smartstep.home.presentation.step_counter.components.MotionSenorDialog
@@ -50,11 +52,12 @@ import com.upsidedown.smartstep.home.presentation.step_counter.components.SmartS
 import com.upsidedown.smartstep.home.presentation.step_counter.components.StepCounterCard
 import com.upsidedown.smartstep.home.presentation.step_counter.components.StepCounterTopAppBar
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun StepCounterRoot(
     onClickPersonalSetting: () -> Unit,
-    viewModel: StepCounterViewModel = viewModel()
+    viewModel: StepCounterViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -65,7 +68,6 @@ fun StepCounterRoot(
         onResult = { isGranted ->
             Log.d("Permission", "Body Sensor permission launcher $isGranted")
             viewModel.onAction(StepCounterAction.OnResultRequestingPhysicalActivity(isGranted))
-            // You can notify the ViewModel about the result here if needed
         }
     )
 
@@ -87,6 +89,17 @@ fun StepCounterRoot(
                         backgroundLocationResult = ignoreBatteryOptimizationResult
                     )
                 )
+                
+                if (activityRecognitionResult) {
+                    val intent = Intent(context, StepCounterService::class.java).apply {
+                        action = StepCounterService.ACTION_START
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        context.startForegroundService(intent)
+                    } else {
+                        context.startService(intent)
+                    }
+                }
             }
 
             StepCounterEvent.RequestPhysicalActivityPermission -> {
@@ -113,8 +126,6 @@ fun StepCounterRoot(
             StepCounterEvent.OpenSetting -> {
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = Uri.fromParts("package", context.packageName, null)
-                    // Ensure the activity opens in a new task so the back button
-                    // returns correctly to the app
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
                 context.startActivity(intent)
@@ -123,13 +134,27 @@ fun StepCounterRoot(
             StepCounterEvent.RequestForBatteryOptimization -> {
                 context.requestForBatteryOptimization()
             }
+            
+            StepCounterEvent.StartStepCounterService -> {
+                val intent = Intent(context, StepCounterService::class.java).apply {
+                    action = StepCounterService.ACTION_START
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(intent)
+                } else {
+                    context.startService(intent)
+                }
+            }
+            
+            StepCounterEvent.StopStepCounterService -> {
+                val intent = Intent(context, StepCounterService::class.java).apply {
+                    action = StepCounterService.ACTION_STOP
+                }
+                context.startService(intent)
+            }
         }
 
     }
-
-//    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-//        viewModel.onAction(StepCounterAction.OnResume)
-//    }
 
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
@@ -294,8 +319,6 @@ fun StepCounterScreen(
 private fun Context.requestForBatteryOptimization() {
     val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
         data = Uri.fromParts("package", packageName, null)
-        // Ensure the activity opens in a new task so the back button
-        // returns correctly to the app
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
     startActivity(intent)
