@@ -54,6 +54,7 @@ import com.upsidedown.smartstep.core.presentation.designsystem.theme.SmartStepTh
 import com.upsidedown.smartstep.core.presentation.designsystem.theme.bodyMediumMedium
 import com.upsidedown.smartstep.core.presentation.util.UiText
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 @Composable
 fun SmartStepPickerCard(
@@ -272,7 +273,12 @@ fun SmartStepHeightPicker(
                     isSelected = internalState is SmartStepHeightType.CM,
                     style = SmartStepChipStyle.LEFT,
                     onClick = {
-                        internalState = SmartStepHeightType.CM()
+                        val current = internalState
+                        if (current is SmartStepHeightType.FtInch) {
+                            val totalInches = current.selectedFt * 12 + current.selectedInch
+                            val cm = (totalInches * 2.54).roundToInt()
+                            internalState = SmartStepHeightType.CM(selectedValue = cm)
+                        }
                     },
                     modifier = Modifier.weight(1f)
                 )
@@ -281,7 +287,14 @@ fun SmartStepHeightPicker(
                     isSelected = internalState is SmartStepHeightType.FtInch,
                     style = SmartStepChipStyle.RIGHT,
                     onClick = {
-                        internalState = SmartStepHeightType.FtInch()
+                        val current = internalState
+                        if (current is SmartStepHeightType.CM) {
+                            val totalInches = (current.selectedValue / 2.54).roundToInt()
+                            internalState = SmartStepHeightType.FtInch(
+                                selectedFt = totalInches / 12,
+                                selectedInch = totalInches % 12
+                            )
+                        }
                     },
                     modifier = Modifier.weight(1f)
                 )
@@ -378,7 +391,11 @@ fun SmartStepWeightPicker(
                     isSelected = internalState is SmartStepWeightType.KG,
                     style = SmartStepChipStyle.LEFT,
                     onClick = {
-                        internalState = SmartStepWeightType.KG()
+                        val current = internalState
+                        if (current is SmartStepWeightType.LBS) {
+                            val kg = (current.selectedLbs * 0.453592).roundToInt()
+                            internalState = SmartStepWeightType.KG(selectedKg = kg)
+                        }
                     },
                     modifier = Modifier.weight(1f)
                 )
@@ -387,7 +404,11 @@ fun SmartStepWeightPicker(
                     isSelected = internalState is SmartStepWeightType.LBS,
                     style = SmartStepChipStyle.RIGHT,
                     onClick = {
-                        internalState = SmartStepWeightType.LBS()
+                        val current = internalState
+                        if (current is SmartStepWeightType.KG) {
+                            val lbs = (current.selectedKg / 0.453592).roundToInt()
+                            internalState = SmartStepWeightType.LBS(selectedLbs = lbs)
+                        }
                     },
                     modifier = Modifier.weight(1f)
                 )
