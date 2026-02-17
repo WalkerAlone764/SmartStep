@@ -74,7 +74,11 @@ fun StepCounterRoot(
     ObserveAsEvents(viewModel.event) { event ->
         when(event) {
             StepCounterEvent.ExitApp -> {
-                //TODO: Handle exit
+                val intent = Intent(context, StepCounterService::class.java).apply {
+                    action = StepCounterService.ACTION_STOP
+                }
+                context.startService(intent)
+                activity?.finish()
             }
 
             StepCounterEvent.CheckAllPermission -> {
