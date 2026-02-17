@@ -38,6 +38,7 @@ class StepCounterViewModel(
         .onStart {
             if (!hasLoadedInitialData) {
                 /** Load initial data here **/
+                _event.send(StepCounterEvent.RequestPhysicalActivityPermission)
                 hasLoadedInitialData = true
             }
         }
@@ -153,10 +154,12 @@ class StepCounterViewModel(
             return
         }
 
-        if (!_state.value.hasIgnoreBatteryOptimizationPermission) {
-            _state.update { it.copy(
-                isIgnoreBatteryOptimizationDialogShown = true
-            ) }
+        if (result) {
+            if (!_state.value.hasIgnoreBatteryOptimizationPermission) {
+                _state.update { it.copy(
+                    isIgnoreBatteryOptimizationDialogShown = true
+                ) }
+            }
         }
 
     }
@@ -165,14 +168,15 @@ class StepCounterViewModel(
         activityRecognitionResult: Boolean,
         ignoreBatteryOptimizationIgnore: Boolean
     ) {
-        _state.update {
-            it.copy(
-                hasActivityRecognitionPermission = activityRecognitionResult,
-                hasIgnoreBatteryOptimizationPermission = ignoreBatteryOptimizationIgnore,
-                isActivityRecognitionPermissionRationaleDialogShown = !activityRecognitionResult
-            )
-        }
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    hasActivityRecognitionPermission = activityRecognitionResult,
+                    hasIgnoreBatteryOptimizationPermission = ignoreBatteryOptimizationIgnore,
+                )
+            }
 
+        }
 
     }
 
