@@ -75,14 +75,13 @@ fun PersonalSettingScreen(
                     .widthIn(
                         max = 394.dp
                     )
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Column(
                     modifier = Modifier
                         .weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top)
                 ) {
                     GenderOptionComponent(
                         selectedGender = state.selectedGender,
