@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -243,6 +244,9 @@ fun StepCounterScreen(
                 goalSteps = state.goalSteps,
                 modifier = Modifier
                     .padding(innerPadding)
+                    .padding(
+                        horizontal = 20.dp
+                    )
                     .fillMaxSize()
                     .wrapContentSize()
             )

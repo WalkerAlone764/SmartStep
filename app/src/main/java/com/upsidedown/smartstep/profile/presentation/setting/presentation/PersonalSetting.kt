@@ -2,14 +2,17 @@ package com.upsidedown.smartstep.profile.presentation.setting.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,78 +57,94 @@ fun PersonalSettingScreen(
             PersonalSettingTopBar()
         }
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(innerPadding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(
+                    horizontal = 16.dp
+                )
+                .padding(
+                    top = 16.dp
+                ),
+            contentAlignment = Alignment.TopCenter
         ) {
             Column(
                 modifier = Modifier
-                    .weight(1f),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .widthIn(
+                        max = 394.dp
+                    )
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                GenderOptionComponent(
-                    selectedGender = state.selectedGender,
-                    onGenderSelected = {
-                        onAction(PersonalSettingAction.OnGenderSelected(it))
-                    }
-                )
-
-                HeightOptionComponent(
-                    isHeightMenuShown = state.isHeightMenuShown,
-                    selectedHeightType = state.selectedHeightType,
-                    heightTypeAsString = state.selectedHeightType.let {
-                        when (it) {
-                            is SmartStepHeightType.CM -> "${it.selectedValue} cm"
-                            is SmartStepHeightType.FtInch -> "${it.selectedFt} ft ${it.selectedInch} in"
-                        }
-                    },
-                    onHeightTypeSelected = {
-                        onAction(PersonalSettingAction.OnHeightSelected(it))
-                    },
-                    onClick = {
-                        onAction(PersonalSettingAction.OnShowHeightMenu(true))
-                    },
-                    onDismiss = {
-                        onAction(PersonalSettingAction.OnShowHeightMenu(false))
-                    }
-                )
-
-                WeightOptionComponent(
-                    isWeightMenuShown = state.isWeightMenuShown,
-                    selectedWeightType = state.selectedWeightType,
-                    weightTypeAsString = state.selectedWeightType.let {
-                        when (it) {
-                            is SmartStepWeightType.KG -> "${it.selectedKg} kg"
-                            is SmartStepWeightType.LBS -> "${it.selectedLbs} lbs"
-                        }
-                    },
-                    onWeightTypeSelected = {
-                        onAction(PersonalSettingAction.OnWeightSelected(it))
-                    },
-                    onClick = {
-                        onAction(PersonalSettingAction.OnShowWeightMenu(true))
-                    },
-                    onDismiss = {
-                        onAction(PersonalSettingAction.OnShowWeightMenu(false))
-                    }
-                )
-            }
-
-            Column(
-            ) {
-                SmartStepButton(
-                    text = "Save",
-                    onClick = {
-                        onAction(PersonalSettingAction.OnClickSave)
-                    },
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    GenderOptionComponent(
+                        selectedGender = state.selectedGender,
+                        onGenderSelected = {
+                            onAction(PersonalSettingAction.OnGenderSelected(it))
+                        }
+                    )
 
-                )
+                    HeightOptionComponent(
+                        isHeightMenuShown = state.isHeightMenuShown,
+                        selectedHeightType = state.selectedHeightType,
+                        heightTypeAsString = state.selectedHeightType.let {
+                            when (it) {
+                                is SmartStepHeightType.CM -> "${it.selectedValue} cm"
+                                is SmartStepHeightType.FtInch -> "${it.selectedFt} ft ${it.selectedInch} in"
+                            }
+                        },
+                        onHeightTypeSelected = {
+                            onAction(PersonalSettingAction.OnHeightSelected(it))
+                        },
+                        onClick = {
+                            onAction(PersonalSettingAction.OnShowHeightMenu(true))
+                        },
+                        onDismiss = {
+                            onAction(PersonalSettingAction.OnShowHeightMenu(false))
+                        }
+                    )
+
+                    WeightOptionComponent(
+                        isWeightMenuShown = state.isWeightMenuShown,
+                        selectedWeightType = state.selectedWeightType,
+                        weightTypeAsString = state.selectedWeightType.let {
+                            when (it) {
+                                is SmartStepWeightType.KG -> "${it.selectedKg} kg"
+                                is SmartStepWeightType.LBS -> "${it.selectedLbs} lbs"
+                            }
+                        },
+                        onWeightTypeSelected = {
+                            onAction(PersonalSettingAction.OnWeightSelected(it))
+                        },
+                        onClick = {
+                            onAction(PersonalSettingAction.OnShowWeightMenu(true))
+                        },
+                        onDismiss = {
+                            onAction(PersonalSettingAction.OnShowWeightMenu(false))
+                        }
+                    )
+                }
+
+                Column(
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    SmartStepButton(
+                        text = "Save",
+                        onClick = {
+                            onAction(PersonalSettingAction.OnClickSave)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+
+                    )
+                }
             }
         }
     }

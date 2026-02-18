@@ -34,10 +34,12 @@ class AndroidStepDataSource(
 
                     val steps = event.values[0].toLong()
                     Log.d("AndroidStepDataSource suspend", "Steps since last reboot: $steps")
-                    applicationScope.launch(Dispatchers.IO) {
+                    applicationScope.launch {
                         dao.increaseStepCount(LocalDate.now(), steps.toInt())
                     }
-                        continuation.resume(steps)
+                        if (continuation.isActive) {
+                            continuation.resume(steps)
+                        }
 
                 }
 

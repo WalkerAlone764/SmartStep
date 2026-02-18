@@ -169,6 +169,7 @@ class StepCounterViewModel(
         ignoreBatteryOptimizationIgnore: Boolean
     ) {
         viewModelScope.launch {
+            val prevState = _state.value
             _state.update {
                 it.copy(
                     hasActivityRecognitionPermission = activityRecognitionResult,
@@ -176,6 +177,13 @@ class StepCounterViewModel(
                 )
             }
 
+            // If activity recognition was just granted (e.g. user came back from settings)
+            // and battery optimization is not yet ignored, show the dialog.
+            if (!prevState.hasActivityRecognitionPermission && activityRecognitionResult) {
+                if (!ignoreBatteryOptimizationIgnore) {
+                    _state.update { it.copy(isIgnoreBatteryOptimizationDialogShown = true) }
+                }
+            }
         }
 
     }
