@@ -53,14 +53,17 @@ import com.upsidedown.smartstep.core.presentation.designsystem.components.button
 import com.upsidedown.smartstep.core.presentation.designsystem.theme.SmartStepTheme
 import com.upsidedown.smartstep.core.presentation.designsystem.theme.bodyMediumMedium
 import com.upsidedown.smartstep.core.presentation.util.UiText
+import java.time.LocalDate
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
 @Composable
 fun SmartStepPickerCard(
     title: String,
-    subtitle: String,
     modifier: Modifier = Modifier,
+    subtitle: String? = null,
+    okText: String = stringResource(R.string.save),
+    cancelText: String = stringResource(R.string.cancel),
     unitSelector: @Composable () -> Unit = {},
     pickerContent: @Composable () -> Unit = {},
     onCancel: () -> Unit = {},
@@ -84,18 +87,22 @@ fun SmartStepPickerCard(
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.inverseOnSurface
-            )
+            if (subtitle != null) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.inverseOnSurface
+                )
+            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            if (subtitle != null) {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
             unitSelector()
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(if (subtitle == null) 8.dp else 24.dp))
 
             Box(
                 modifier = Modifier
@@ -123,12 +130,12 @@ fun SmartStepPickerCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 SmartStepButton(
-                    text = stringResource(R.string.cancel),
+                    text = cancelText,
                     onClick = onCancel,
                     style = SmartStepButtonStyle.TEXT
                 )
                 SmartStepButton(
-                    text = stringResource(R.string.ok),
+                    text = okText,
                     onClick = onOk,
                     style = SmartStepButtonStyle.TEXT
                 )
@@ -143,7 +150,8 @@ fun VerticalNumberPicker(
     selectedValue: Int,
     onValueChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    unit: String? = null
+    unit: String? = null,
+    label: (Int) -> String = { it.toString() }
 ) {
     val listState = rememberLazyListState()
     val itemHeight = 40.dp
@@ -217,7 +225,7 @@ fun VerticalNumberPicker(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = value.toString(),
+                            text = label(value),
                             style = MaterialTheme.typography.bodyLarge.copy(
                                 fontWeight = FontWeight(fontWeight),
                                 fontSize = fontSize.sp,
@@ -456,6 +464,82 @@ fun SmartStepWeightPicker(
             }
         }
     )
+}
+
+@Composable
+fun SmartStepDatePicker(
+    initialDate: LocalDate,
+    onDismiss: () -> Unit,
+    onConfirm: (LocalDate) -> Unit,
+    modifier: Modifier = Modifier,
+    title: String = stringResource(R.string.date), // Should be stringResource(R.string.date) if exists
+) {
+    var selectedDate by retain(initialDate) { mutableStateOf(initialDate) }
+
+    SmartStepPickerCard(
+        title = title,
+        modifier = modifier,
+        onCancel = onDismiss,
+        onOk = {
+            onConfirm(selectedDate)
+            onDismiss()
+        },
+        pickerContent = {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                key("year") {
+                    VerticalNumberPicker(
+                        range = 1900..2100,
+                        selectedValue = selectedDate.year,
+                        onValueChange = {
+                            selectedDate = selectedDate.withYear(it)
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                key("month") {
+                    VerticalNumberPicker(
+                        range = 1..12,
+                        selectedValue = selectedDate.monthValue,
+                        onValueChange = {
+                            selectedDate = try {
+                                selectedDate.withMonth(it)
+                            } catch (e: Exception) {
+                                selectedDate.withDayOfMonth(1).withMonth(it)
+                            }
+                        },
+                        label = { it.toString().padStart(2, '0') },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                key("day") {
+                    val daysInMonth = selectedDate.lengthOfMonth()
+                    VerticalNumberPicker(
+                        range = 1..daysInMonth,
+                        selectedValue = selectedDate.dayOfMonth.coerceAtMost(daysInMonth),
+                        onValueChange = {
+                            selectedDate = selectedDate.withDayOfMonth(it)
+                        },
+                        label = { it.toString().padStart(2, '0') },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun DatePickerPreview() {
+    SmartStepTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            SmartStepDatePicker(
+                initialDate = LocalDate.of(2025, 11, 30),
+                onDismiss = {},
+                onConfirm = {}
+            )
+        }
+    }
 }
 
 @Preview(showBackground = true)
