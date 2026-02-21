@@ -33,6 +33,6 @@ sealed interface StepCounterAction {
     data class OnSaveStepGoal(val stepGoal: Int) : StepCounterAction
 
     data object OnClickPersonalSettingMenu: StepCounterAction
-
-
+    
+    data object OnClickPauseResume: StepCounterAction
 }

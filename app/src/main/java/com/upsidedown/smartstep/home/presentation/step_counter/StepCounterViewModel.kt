@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import kotlin.math.roundToInt
 
 class StepCounterViewModel(
     private val stepRepository: StepRepository,
@@ -30,9 +31,17 @@ class StepCounterViewModel(
 
     val state = _state
         .combine(_steps) { state, steps ->
-            Log.d("viewmodel steps", steps.toString())
+            val totalSteps = steps.sumOf { it.count }
+            // Simple calculation for demonstration
+            val distance = (totalSteps * 0.00075 * 10).roundToInt() / 10.0
+            val calories = (totalSteps * 0.04).roundToInt()
+            val time = (totalSteps * 0.01).roundToInt()
+
             state.copy(
-                currentSteps = steps.sumOf { it.count },
+                currentSteps = totalSteps,
+                distanceKm = distance,
+                calories = calories,
+                timeMin = time
             )
         }
         .onStart {
@@ -80,6 +89,14 @@ class StepCounterViewModel(
             StepCounterAction.OnDismissStepGoalSelectionDialog -> onDismissStepGoalSelectionDialog()
             is StepCounterAction.OnSaveStepGoal -> onSaveStepGoal(action.stepGoal)
             StepCounterAction.OnClickPersonalSettingMenu -> Unit
+            StepCounterAction.OnClickPauseResume -> {
+                _state.update { it.copy(isPaused = !it.isPaused) }
+                if (_state.value.isPaused) {
+                    _event.trySend(StepCounterEvent.StopStepCounterService)
+                } else {
+                    _event.trySend(StepCounterEvent.StartStepCounterService)
+                }
+            }
         }
     }
 

@@ -242,6 +242,12 @@ fun StepCounterScreen(
                 currentSteps = state.currentSteps,
                 formattedCurrentSteps = state.formattedCurrentSteps,
                 goalSteps = state.goalSteps,
+                isPaused = state.isPaused,
+                distanceKm = state.distanceKm,
+                calories = state.calories,
+                timeMin = state.timeMin,
+                onEditClick = { onAction(StepCounterAction.OnClickStepGoalMenu) },
+                onPausePlayClick = { onAction(StepCounterAction.OnClickPauseResume) },
                 modifier = Modifier
                     .padding(innerPadding)
                     .padding(
@@ -338,6 +344,7 @@ private fun Preview() {
     SmartStepTheme {
         StepCounterScreen(
             state = StepCounterState(
+                isPaused = false,
                 currentSteps = 4523,
                 goalSteps = 6000
             ),
