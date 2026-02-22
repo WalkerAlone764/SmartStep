@@ -97,7 +97,40 @@ class StepCounterViewModel(
                     _event.trySend(StepCounterEvent.StartStepCounterService)
                 }
             }
+            StepCounterAction.OnClickEditSteps -> {
+                _state.update { it.copy(isEditStepsDialogShown = true) }
+            }
+            StepCounterAction.OnDismissEditStepsDialog -> {
+                _state.update { it.updateEditStepsDialogShown(false) }
+            }
+            is StepCounterAction.OnSaveEditSteps -> onSaveEditSteps()
+            StepCounterAction.OnClickDate -> {
+                _state.update { it.copy(isDatePickerDialogShown = true) }
+            }
+            StepCounterAction.OnDismissDatePickerDialog -> {
+                _state.update { it.copy(isDatePickerDialogShown = false) }
+            }
+            is StepCounterAction.OnDateSelected -> {
+                _state.update { it.copy(selectedDateInEdit = action.date, isDatePickerDialogShown = false) }
+            }
         }
+    }
+
+    private fun onSaveEditSteps() {
+        viewModelScope.launch {
+            val currentState = _state.value
+            val steps = currentState.stepsInEdit.text.toString()
+            Log.d("Save Steps", steps)
+            if (steps.toIntOrNull() == null) {
+                return@launch
+            }
+            stepRepository.updateStepsByDate(currentState.selectedDateInEdit,steps.toInt() )
+            _state.update { it.updateEditStepsDialogShown(false) }
+        }
+    }
+
+    private fun StepCounterState.updateEditStepsDialogShown(shown: Boolean): StepCounterState {
+        return copy(isEditStepsDialogShown = shown)
     }
 
     private fun onSaveStepGoal(stepGoal: Int) {

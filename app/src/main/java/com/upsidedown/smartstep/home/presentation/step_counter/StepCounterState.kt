@@ -1,6 +1,8 @@
 package com.upsidedown.smartstep.home.presentation.step_counter
 
+import androidx.compose.foundation.text.input.TextFieldState
 import java.text.NumberFormat
+import java.time.LocalDate
 import java.util.Locale
 
 data class StepCounterState(
@@ -16,8 +18,15 @@ data class StepCounterState(
     val isActivityRecognitionPermissionRationaleDialogShown: Boolean = false,
     val isActivityRecognitionPermissionSettingDialogShown: Boolean = false,
     val isIgnoreBatteryOptimizationDialogShown: Boolean = false,
-    val isStepGoalSelectionDialogShown: Boolean = false
+    val isStepGoalSelectionDialogShown: Boolean = false,
+    val isEditStepsDialogShown: Boolean = false,
+    val isDatePickerDialogShown: Boolean = false,
+    val selectedDateInEdit: LocalDate = LocalDate.now(),
+    val stepsInEdit: TextFieldState = TextFieldState(initialText = "0")
 ) {
     val formattedCurrentSteps: String
         get() = NumberFormat.getNumberInstance(Locale.US).format(currentSteps)
+
+    val formattedSelectedDate: String
+        get() = selectedDateInEdit.toString().replace("-", "/")
 }

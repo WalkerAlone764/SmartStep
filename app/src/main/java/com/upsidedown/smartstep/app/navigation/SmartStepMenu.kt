@@ -32,6 +32,7 @@ fun SmartStepMenu(
     onFixStopCountingStep: () -> Unit,
     onStepGoalClick: () -> Unit,
     onPersonalSettingsClick: () -> Unit,
+    onEditStepsClick: () -> Unit,
     onExitClick: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit = {}
@@ -72,6 +73,11 @@ fun SmartStepMenu(
                     SmartStepMenuItem(
                         text = stringResource(id = R.string.personal_settings),
                         onClick = onPersonalSettingsClick
+                    )
+
+                    SmartStepMenuItem(
+                        text = stringResource(id = R.string.edit_steps),
+                        onClick = onEditStepsClick
                     )
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp),
@@ -121,6 +127,7 @@ private fun SmartStepMenuPreview() {
             onFixStopCountingStep = {},
             onStepGoalClick = {},
             onPersonalSettingsClick = {},
+            onEditStepsClick = {},
             onExitClick = {}
         )
     }

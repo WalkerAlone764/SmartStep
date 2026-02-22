@@ -33,18 +33,20 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.upsidedown.smartstep.R
 import com.upsidedown.smartstep.app.navigation.SmartStepMenu
+import com.upsidedown.smartstep.core.presentation.designsystem.components.picker.SmartStepDatePicker
 import com.upsidedown.smartstep.core.presentation.designsystem.theme.SmartStepTheme
 import com.upsidedown.smartstep.core.presentation.util.ObserveAsEvents
 import com.upsidedown.smartstep.home.data.StepCounterService
 import com.upsidedown.smartstep.home.presentation.step_counter.StepCounterAction.*
+import com.upsidedown.smartstep.home.presentation.step_counter.components.EditStepsDialog
 import com.upsidedown.smartstep.home.presentation.step_counter.components.IgnoreBatteryOptimizationPermissionDialog
 import com.upsidedown.smartstep.home.presentation.step_counter.components.MotionSenorDialog
 import com.upsidedown.smartstep.home.presentation.step_counter.components.PhysicalActivityPermissionDialog
@@ -220,6 +222,12 @@ fun StepCounterScreen(
                 onAction(StepCounterAction.OnClickPersonalSettingMenu)
             }
         },
+        onEditStepsClick = {
+            scope.launch {
+                drawerState.close()
+                onAction(StepCounterAction.OnClickEditSteps)
+            }
+        },
         onExitClick = {
             onAction(StepCounterAction.OnClickExit)
             scope.launch {
@@ -327,6 +335,33 @@ fun StepCounterScreen(
                 onAction(StepCounterAction.OnSaveStepGoal(it))
             }
         )
+    }
+
+    if (state.isEditStepsDialogShown) {
+        EditStepsDialog(
+            steps = state.stepsInEdit,
+            onDismiss = {
+                onAction(StepCounterAction.OnDismissEditStepsDialog)
+            },
+            onClickDate = {
+                onAction(StepCounterAction.OnClickDate)
+            },
+            onSave = { date, time, steps ->
+                onAction(StepCounterAction.OnSaveEditSteps(date, time, steps))
+            },
+            date = state.formattedSelectedDate,
+            showTimeColumn = false
+        )
+    }
+
+    if (state.isDatePickerDialogShown) {
+        Dialog(onDismissRequest = { onAction(StepCounterAction.OnDismissDatePickerDialog) }) {
+            SmartStepDatePicker(
+                initialDate = state.selectedDateInEdit,
+                onDismiss = { onAction(StepCounterAction.OnDismissDatePickerDialog) },
+                onConfirm = { onAction(StepCounterAction.OnDateSelected(it)) }
+            )
+        }
     }
 }
 

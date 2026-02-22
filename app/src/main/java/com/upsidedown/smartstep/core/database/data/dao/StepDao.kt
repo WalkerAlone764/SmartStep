@@ -26,12 +26,17 @@ interface StepDao {
                 count = (stepEntity?.count ?: 0) + amount
             )
         )
-
     }
+
+    @Query("UPDATE steps SET count = :count WHERE date = :date")
+    suspend fun updateStepsByDate(date: LocalDate, count: Int)
+
+    @Query("UPDATE steps SET count = 0 WHERE date = :date")
+    suspend fun resetStepsForDate(date: LocalDate)
 
     @Query("SELECT * FROM steps ORDER BY date DESC")
     fun getAllSteps(): Flow<List<StepEntity>>
 
     @Query("SELECT * FROM steps WHERE date = :date ORDER BY date DESC")
-    fun getAllStepsSortedByDate(date: LocalDate): Flow<List<StepEntity>> = getAllSteps()
+    fun getAllStepsSortedByDate(date: LocalDate): Flow<List<StepEntity>>
 }

@@ -1,5 +1,7 @@
 package com.upsidedown.smartstep.home.presentation.step_counter
 
+import java.time.LocalDate
+
 sealed interface StepCounterAction {
 
     data object OnResume: StepCounterAction
@@ -35,4 +37,12 @@ sealed interface StepCounterAction {
     data object OnClickPersonalSettingMenu: StepCounterAction
     
     data object OnClickPauseResume: StepCounterAction
+
+    data object OnClickEditSteps: StepCounterAction
+    data object OnDismissEditStepsDialog: StepCounterAction
+    data class OnSaveEditSteps(val date: String, val time: String, val steps: String): StepCounterAction
+
+    data object OnClickDate: StepCounterAction
+    data object OnDismissDatePickerDialog: StepCounterAction
+    data class OnDateSelected(val date: LocalDate): StepCounterAction
 }

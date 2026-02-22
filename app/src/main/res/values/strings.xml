@@ -37,4 +37,5 @@
     <string name="kcal">kcal</string>
     <string name="min">min</string>
     <string name="step_counter_paused">Paused</string>
+    <string name="edit_steps">Edit Steps</string>
 </resources>
