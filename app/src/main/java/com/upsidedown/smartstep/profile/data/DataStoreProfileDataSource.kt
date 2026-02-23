@@ -43,8 +43,8 @@ class DataStoreProfileDataSource(
                 try {
                     Profile(
                         gender = Gender.valueOf(genderStr),
-                        heightCm = height,
-                        weightKg = weight,
+                        height = height,
+                        weight = weight,
                         heightUnit = HeightUnit.valueOf(heightUnitStr),
                         weightUnit = WeightUnit.valueOf(weightUnitStr)
                     )
@@ -61,8 +61,8 @@ class DataStoreProfileDataSource(
     override suspend fun saveProfile(profile: Profile) {
         context.dataStore.edit { preferences ->
             preferences[GENDER] = profile.gender.name
-            preferences[HEIGHT_CM] = profile.heightCm
-            preferences[WEIGHT_KG] = profile.weightKg
+            preferences[HEIGHT_CM] = profile.height
+            preferences[WEIGHT_KG] = profile.weight
             preferences[HEIGHT_UNIT] = profile.heightUnit.name
             preferences[WEIGHT_UNIT] = profile.weightUnit.name
             preferences[IS_SETUP_VISITED] = true

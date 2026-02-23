@@ -7,13 +7,7 @@ plugins {
 
 android {
     namespace = "com.upsidedown.smartstep"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
-
-
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.upsidedown.smartstep"
@@ -37,6 +31,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
     buildFeatures {
         compose = true
@@ -77,4 +72,6 @@ dependencies {
     //room
     implementation(libs.bundles.room)
     ksp(libs.androidx.room.compiler)
+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }

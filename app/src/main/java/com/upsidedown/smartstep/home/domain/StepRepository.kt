@@ -12,6 +12,8 @@ interface StepRepository {
 
     fun getAllStepsByDate(date: LocalDate): Flow<List<Step>>
 
+    fun getStepsInRange(startDate: LocalDate, endDate: LocalDate): Flow<List<Step>>
+
     suspend fun increaseStepCount(date: LocalDate, count: Int)
 
     suspend fun updateStepsByDate(date: LocalDate, count: Int)

@@ -4,8 +4,8 @@ import com.upsidedown.smartstep.core.presentation.util.Gender
 
 data class Profile(
     val gender: Gender,
-    val heightCm: Int,
-    val weightKg: Int,
+    val height: Int,
+    val weight: Int,
     val heightUnit: HeightUnit,
     val weightUnit: WeightUnit
 )

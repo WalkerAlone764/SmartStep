@@ -27,6 +27,10 @@ class StepRepositoryImpl(
         return stepDao.getAllStepsSortedByDate(date).map { it.map { it.toStep() } }
     }
 
+    override fun getStepsInRange(startDate: LocalDate, endDate: LocalDate): Flow<List<Step>> {
+        return stepDao.getStepsInRange(startDate, endDate).map { it.map { it.toStep() } }
+    }
+
     override suspend fun increaseStepCount(date: LocalDate, count: Int) {
         return stepDao.increaseStepCount(date, count)
     }

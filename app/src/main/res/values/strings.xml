@@ -34,6 +34,7 @@
     <string name="save">Save</string>
     <string name="date">Date</string>
     <string name="km">km</string>
+    <string name="mi">mi</string>
     <string name="kcal">kcal</string>
     <string name="min">min</string>
     <string name="step_counter_paused">Paused</string>

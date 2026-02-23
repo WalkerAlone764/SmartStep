@@ -1,25 +1,40 @@
 package com.upsidedown.smartstep.home.presentation.step_counter
 
 import android.util.Log
+import androidx.compose.ui.text.style.TextDecoration.Companion.combine
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.upsidedown.smartstep.core.database.domain.model.Step
+import com.upsidedown.smartstep.core.presentation.util.Gender
 import com.upsidedown.smartstep.home.domain.StepDataSource
 import com.upsidedown.smartstep.home.domain.StepRepository
+import com.upsidedown.smartstep.profile.domain.HeightUnit
+import com.upsidedown.smartstep.profile.domain.ProfileDataSource
+import com.upsidedown.smartstep.profile.domain.WeightUnit
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.runningReduce
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import kotlin.math.roundToInt
 
+// Assuming these enums exist in the profile package
+// enum class WeightUnit { KG, LB }
+// enum class Gender { MALE, FEMALE }
+
 class StepCounterViewModel(
     private val stepRepository: StepRepository,
-    private val stepDataSource: StepDataSource
+    private val stepDataSource: StepDataSource,
+    private val profileDataSource: ProfileDataSource
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -28,22 +43,34 @@ class StepCounterViewModel(
     private val _steps = stepRepository
         .getAllStepsByDate(LocalDate.now())
 
+    private val _pastSevenDaysSteps = stepRepository
+        .getStepsInRange(LocalDate.now().minusDays(6), LocalDate.now())
 
-    val state = _state
-        .combine(_steps) { state, steps ->
-            val totalSteps = steps.sumOf { it.count }
-            // Simple calculation for demonstration
-            val distance = (totalSteps * 0.00075 * 10).roundToInt() / 10.0
-            val calories = (totalSteps * 0.04).roundToInt()
-            val time = (totalSteps * 0.01).roundToInt()
+    private val _profile = profileDataSource.profile
 
-            state.copy(
-                currentSteps = totalSteps,
-                distanceKm = distance,
-                calories = calories,
-                timeMin = time
-            )
+    private val lastStepCount = MutableStateFlow(0)
+    val stepCounts =  _steps
+        .map { it.sumOf { it.count } }
+        .runningReduce {
+            accumulator, value ->
+            if (accumulator - lastStepCount.value >= 10) {
+                lastStepCount.value = accumulator
+            }
+            accumulator + value
         }
+
+
+
+    val state = combine(_state, _steps,_pastSevenDaysSteps, _profile) {
+            state, steps, pastSteps, profile ->
+            if (state.isPaused) {
+                state // Frozen when paused
+            } else {
+                calculateAndUpdateMetrics(state, steps, pastSteps, profile)
+            }
+        }
+
+        .flowOn(Dispatchers.IO)
         .onStart {
             if (!hasLoadedInitialData) {
                 /** Load initial data here **/
@@ -134,22 +161,30 @@ class StepCounterViewModel(
     }
 
     private fun onSaveStepGoal(stepGoal: Int) {
-        _state.update { it.copy(
-            goalSteps = stepGoal,
-            isStepGoalSelectionDialogShown = false,
-        ) }
+        _state.update {
+            it.copy(
+                goalSteps = stepGoal,
+                isStepGoalSelectionDialogShown = false,
+            )
+        }
     }
 
     private fun onDismissStepGoalSelectionDialog() {
-        _state.update { it.copy(isStepGoalSelectionDialogShown = false) }
+        _state.update {
+            it.copy(isStepGoalSelectionDialogShown = false)
+        }
     }
 
     private fun onClickStepGoalMenu() {
-        _state.update { it.copy(isStepGoalSelectionDialogShown = true) }
+        _state.update {
+            it.copy(isStepGoalSelectionDialogShown = true)
+        }
     }
 
     private fun onClickFixStopCountingStep() {
-        _state.update { it.copy(isIgnoreBatteryOptimizationDialogShown = true) }
+        _state.update {
+            it.copy(isIgnoreBatteryOptimizationDialogShown = true)
+        }
     }
 
     private fun onResume() {
@@ -159,36 +194,46 @@ class StepCounterViewModel(
     }
 
     private fun onClickAllowIgnoreBatteryOptimization() {
-        _state.update { it.copy(isIgnoreBatteryOptimizationDialogShown = false) }
+        _state.update {
+            it.copy(isIgnoreBatteryOptimizationDialogShown = false)
+        }
         _event.trySend(StepCounterEvent.RequestForBatteryOptimization)
     }
 
     private fun onDismissIgnoreBatteryOptimizationDialog() {
-        _state.update { it.copy(isIgnoreBatteryOptimizationDialogShown = false) }
+        _state.update {
+            it.copy(isIgnoreBatteryOptimizationDialogShown = false)
+        }
     }
 
     private fun onClickOpenSetting() {
-        _state.update { it.copy(
-            isActivityRecognitionPermissionSettingDialogShown = false,
-            isActivityRecognitionPermissionRationaleDialogShown = false
-        ) }
+        _state.update {
+            it.copy(
+                isActivityRecognitionPermissionSettingDialogShown = false,
+                isActivityRecognitionPermissionRationaleDialogShown = false
+            )
+        }
 
         _event.trySend(StepCounterEvent.OpenSetting)
     }
 
     private fun onClickAllowPhysicalActivity() {
-        _state.update { it.copy(
-            isActivityRecognitionPermissionSettingDialogShown = false,
-            isActivityRecognitionPermissionRationaleDialogShown = false
-        ) }
+        _state.update {
+            it.copy(
+                isActivityRecognitionPermissionSettingDialogShown = false,
+                isActivityRecognitionPermissionRationaleDialogShown = false
+            )
+        }
         _event.trySend(StepCounterEvent.RequestPhysicalActivityPermission)
     }
 
     private fun onCheckCanShowRationaleForPhysicalActivity(canShowRationale: Boolean) {
-            _state.update { it.copy(
-                isActivityRecognitionPermissionRationaleDialogShown = canShowRationale,
-                isActivityRecognitionPermissionSettingDialogShown = !canShowRationale,
-            ) }
+            _state.update {
+                it.copy(
+                    isActivityRecognitionPermissionRationaleDialogShown = canShowRationale,
+                    isActivityRecognitionPermissionSettingDialogShown = !canShowRationale,
+                )
+            }
 
     }
 
@@ -206,13 +251,14 @@ class StepCounterViewModel(
 
         if (result) {
             if (!_state.value.hasIgnoreBatteryOptimizationPermission) {
-                _state.update { it.copy(
-                    isIgnoreBatteryOptimizationDialogShown = true
-                ) }
+                _state.update {
+                    it.copy(isIgnoreBatteryOptimizationDialogShown = true)
+                }
             }
         }
 
     }
+
 
     private fun onCheckPermissionResult(
         activityRecognitionResult: Boolean,
@@ -231,7 +277,9 @@ class StepCounterViewModel(
             // and battery optimization is not yet ignored, show the dialog.
             if (!prevState.hasActivityRecognitionPermission && activityRecognitionResult) {
                 if (!ignoreBatteryOptimizationIgnore) {
-                    _state.update { it.copy(isIgnoreBatteryOptimizationDialogShown = true) }
+                    _state.update {
+                        it.copy(isIgnoreBatteryOptimizationDialogShown = true)
+                    }
                 }
             }
         }
@@ -247,4 +295,100 @@ class StepCounterViewModel(
         _state.update { it.copy(isExitDialogShown = false) }
     }
 
+    private fun calculateAndUpdateMetrics(state: StepCounterState, steps: List<Step>, pastSteps: List<Step>, profile: com.upsidedown.smartstep.profile.domain.Profile?): StepCounterState {
+        val totalSteps = steps.sumOf { it.count }
+        Log.d("StepCounterViewModel", "is call: ${totalSteps - lastStepCount.value >= 10}")
+
+
+        // Check if step count has increased by at least 10 since the last calculation
+        if (totalSteps - lastStepCount.value >= 10) {
+            Log.d("StepCounterViewModel", "is calculating")
+            val heightCm = profile?.height ?: 170 // Default to 170cm if profile not set
+            val isMetric = profile?.heightUnit != HeightUnit.FT_IN
+
+            val stepLengthCm = heightCm * 0.415
+            val distanceMeters = totalSteps * stepLengthCm / 100
+
+            val (distance, unit) = if (isMetric) {
+                val km = distanceMeters / 1000
+                (km * 10).roundToInt() / 10.0 to "km"
+            } else {
+                val mi = distanceMeters / 1609.34
+                (mi * 10).roundToInt() / 10.0 to "mi"
+            }
+
+            // Calculate calories
+            var calories = 0
+            if (profile != null) {
+                var weightKg = profile.weight
+                // Assuming WeightUnit.LB and profile.weightLb exist
+                if (profile.weightUnit == WeightUnit.LBS) {
+                    weightKg = (profile.weight / 2.20462).roundToInt()
+                }
+
+                val genderFactor = when (profile.gender) { // Assuming Gender enum exists
+                    Gender.MALE -> 1.0
+                    Gender.FEMALE -> 0.9
+                }
+
+                val kcalPerStep = weightKg * 0.0005 * genderFactor
+                calories = (totalSteps * kcalPerStep).roundToInt()
+            }
+
+            val time = (totalSteps * 0.01).roundToInt()
+
+            val today = LocalDate.now()
+            val lastSevenDays = (0..6).map { today.minusDays(it.toLong()) }.reversed()
+            val pastStepsByDate = pastSteps.groupBy { it.date }
+                .mapValues { it.value.sumOf { step -> step.count } }
+
+            val pastSevenDaysStepsMap = lastSevenDays.map {
+                date ->
+                mapOf("date" to date, "step" to (pastStepsByDate[date] ?: 0))
+            }
+
+            // Update lastStepCount to the current totalSteps
+            lastStepCount.value = totalSteps
+
+            return state.copy(
+                currentSteps = totalSteps,
+                distance = distance,
+                distanceUnit = unit,
+                calories = calories,
+                timeMin = time,
+                pastSevenDaysSteps = pastSevenDaysStepsMap
+            )
+        } else {
+            // If step count hasn't increased by 10, return the state without updating calories
+            // but still update other metrics if they depend on totalSteps
+            val heightCm = profile?.height ?: 170
+            val isMetric = profile?.heightUnit != HeightUnit.FT_IN
+            val stepLengthCm = heightCm * 0.415
+            val distanceMeters = totalSteps * stepLengthCm / 100
+            val (distance, unit) = if (isMetric) {
+                val km = distanceMeters / 1000
+                (km * 10).roundToInt() / 10.0 to "km"
+            } else {
+                val mi = distanceMeters / 1609.34
+                (mi * 10).roundToInt() / 10.0 to "mi"
+            }
+            val time = (totalSteps * 0.01).roundToInt()
+            val today = LocalDate.now()
+            val lastSevenDays = (0..6).map { today.minusDays(it.toLong()) }.reversed()
+            val pastStepsByDate = pastSteps.groupBy { it.date }
+                .mapValues { it.value.sumOf { step -> step.count } }
+            val pastSevenDaysStepsMap = lastSevenDays.map {
+                date ->
+                mapOf("date" to date, "step" to (pastStepsByDate[date] ?: 0))
+            }
+            return state.copy(
+                currentSteps = totalSteps,
+                distance = distance,
+                distanceUnit = unit,
+                // calories remain unchanged if step count has not increased by 10
+                timeMin = time,
+                pastSevenDaysSteps = pastSevenDaysStepsMap
+            )
+        }
+    }
 }

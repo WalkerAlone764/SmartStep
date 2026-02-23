@@ -39,4 +39,7 @@ interface StepDao {
 
     @Query("SELECT * FROM steps WHERE date = :date ORDER BY date DESC")
     fun getAllStepsSortedByDate(date: LocalDate): Flow<List<StepEntity>>
+
+    @Query("SELECT * FROM steps WHERE date BETWEEN :startDate AND :endDate ORDER BY date ASC")
+    fun getStepsInRange(startDate: LocalDate, endDate: LocalDate): Flow<List<StepEntity>>
 }

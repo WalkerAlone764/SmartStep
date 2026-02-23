@@ -34,9 +34,9 @@ class PersonalSettingViewModel(
                         _state.update { it.copy(
                             selectedGender = savedProfile.gender,
                             selectedHeightType = when (savedProfile.heightUnit) {
-                                HeightUnit.CM -> SmartStepHeightType.CM(selectedValue = savedProfile.heightCm)
+                                HeightUnit.CM -> SmartStepHeightType.CM(selectedValue = savedProfile.height)
                                 HeightUnit.FT_IN -> {
-                                    val totalInches = (savedProfile.heightCm / 2.54).roundToInt()
+                                    val totalInches = (savedProfile.height / 2.54).roundToInt()
                                     SmartStepHeightType.FtInch(
                                         selectedFt = totalInches / 12,
                                         selectedInch = totalInches % 12
@@ -44,9 +44,9 @@ class PersonalSettingViewModel(
                                 }
                             },
                             selectedWeightType = when (savedProfile.weightUnit) {
-                                WeightUnit.KG -> SmartStepWeightType.KG(selectedKg = savedProfile.weightKg)
+                                WeightUnit.KG -> SmartStepWeightType.KG(selectedKg = savedProfile.weight)
                                 WeightUnit.LBS -> SmartStepWeightType.LBS(
-                                    selectedLbs = (savedProfile.weightKg / 0.453592).roundToInt()
+                                    selectedLbs = (savedProfile.weight / 0.453592).roundToInt()
                                 )
                             }
                         ) }
@@ -124,8 +124,8 @@ class PersonalSettingViewModel(
 
         val profile = Profile(
             gender = currentState.selectedGender,
-            heightCm = heightCm,
-            weightKg = weightKg,
+            height = heightCm,
+            weight = weightKg,
             heightUnit = heightUnit,
             weightUnit = weightUnit
         )
@@ -156,9 +156,9 @@ class PersonalSettingViewModel(
                 profileDataSource.saveProfile(
                     profile.copy(
                         gender = currentState.selectedGender,
-                        heightCm = heightCm,
+                        height = heightCm,
                         heightUnit = heightUnit,
-                        weightKg = weightKg,
+                        weight = weightKg,
                         weightUnit = weightUnit
                     )
                 )

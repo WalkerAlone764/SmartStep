@@ -49,7 +49,8 @@ fun StepCounterCard(
     formattedCurrentSteps: String,
     goalSteps: Int,
     isPaused: Boolean,
-    distanceKm: Double,
+    distance: Double,
+    distanceUnit: String,
     calories: Int,
     timeMin: Int,
     onEditClick: () -> Unit,
@@ -152,8 +153,8 @@ fun StepCounterCard(
             ) {
                 StatItem(
                     icon = ImageVector.vectorResource(R.drawable.location_direction),
-                    value = distanceKm.toString(),
-                    unit = stringResource(R.string.km)
+                    value = distance.toString(),
+                    unit = distanceUnit
                 )
                 StatItem(
                     icon = ImageVector.vectorResource(R.drawable.ic_calories),
@@ -255,7 +256,8 @@ private fun StepCounterCardPreview() {
                 formattedCurrentSteps = "4,523",
                 goalSteps = 6000,
                 isPaused = false,
-                distanceKm = 3.2,
+                distance = 3.2,
+                distanceUnit = "km",
                 calories = 215,
                 timeMin = 42,
                 onEditClick = {},
@@ -275,7 +277,8 @@ private fun StepCounterCardPausedPreview() {
                 formattedCurrentSteps = "4,523",
                 goalSteps = 6000,
                 isPaused = true,
-                distanceKm = 3.2,
+                distance = 3.2,
+                distanceUnit = "km",
                 calories = 215,
                 timeMin = 42,
                 onEditClick = {},

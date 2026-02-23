@@ -12,9 +12,15 @@ import android.util.Log
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -23,7 +29,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -46,6 +54,8 @@ import com.upsidedown.smartstep.core.presentation.designsystem.theme.SmartStepTh
 import com.upsidedown.smartstep.core.presentation.util.ObserveAsEvents
 import com.upsidedown.smartstep.home.data.StepCounterService
 import com.upsidedown.smartstep.home.presentation.step_counter.StepCounterAction.*
+import com.upsidedown.smartstep.home.presentation.step_counter.components.DailyAverageCard
+import com.upsidedown.smartstep.home.presentation.step_counter.components.DailyStep
 import com.upsidedown.smartstep.home.presentation.step_counter.components.EditStepsDialog
 import com.upsidedown.smartstep.home.presentation.step_counter.components.IgnoreBatteryOptimizationPermissionDialog
 import com.upsidedown.smartstep.home.presentation.step_counter.components.MotionSenorDialog
@@ -56,6 +66,9 @@ import com.upsidedown.smartstep.home.presentation.step_counter.components.StepCo
 import com.upsidedown.smartstep.home.presentation.step_counter.components.StepCounterTopAppBar
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.Locale
 
 @Composable
 fun StepCounterRoot(
@@ -246,24 +259,55 @@ fun StepCounterScreen(
                 )
             }
         ) { innerPadding ->
-            StepCounterCard(
-                currentSteps = state.currentSteps,
-                formattedCurrentSteps = state.formattedCurrentSteps,
-                goalSteps = state.goalSteps,
-                isPaused = state.isPaused,
-                distanceKm = state.distanceKm,
-                calories = state.calories,
-                timeMin = state.timeMin,
-                onEditClick = { onAction(StepCounterAction.OnClickStepGoalMenu) },
-                onPausePlayClick = { onAction(StepCounterAction.OnClickPauseResume) },
+            Column(
                 modifier = Modifier
                     .padding(innerPadding)
-                    .padding(
-                        horizontal = 20.dp
-                    )
+                    .padding(horizontal = 20.dp)
                     .fillMaxSize()
-                    .wrapContentSize()
-            )
+                    .verticalScroll(rememberScrollState())
+            ) {
+                StepCounterCard(
+                    currentSteps = state.currentSteps,
+                    formattedCurrentSteps = state.formattedCurrentSteps,
+                    goalSteps = state.goalSteps,
+                    isPaused = state.isPaused,
+                    distance = state.distance,
+                    distanceUnit = state.distanceUnit,
+                    calories = state.calories,
+                    timeMin = state.timeMin,
+                    onEditClick = { onAction(StepCounterAction.OnClickStepGoalMenu) },
+                    onPausePlayClick = { onAction(StepCounterAction.OnClickPauseResume) },
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
+
+                AnimatedVisibility(state.pastSevenDaysSteps.isNotEmpty()) {
+                    val dailySteps by remember(state.pastSevenDaysSteps) {
+                        derivedStateOf {
+                            state.pastSevenDaysSteps.map { map ->
+                                val date = map["date"] as LocalDate
+                                val steps = map["step"] as Int
+                                DailyStep(
+                                    day = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
+                                    steps = steps
+                                )
+                            }
+                        }
+                    }
+                    val averageSteps by remember(dailySteps) {
+                        derivedStateOf {
+                            if (dailySteps.isNotEmpty()) dailySteps.sumOf { it.steps } / dailySteps.size else 0
+                        }
+                    }
+
+                    DailyAverageCard(
+                        dailySteps = dailySteps,
+                        averageSteps = averageSteps,
+                        goalSteps = state.goalSteps,
+                        modifier = Modifier.padding(vertical = 16.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
         }
     }
 
