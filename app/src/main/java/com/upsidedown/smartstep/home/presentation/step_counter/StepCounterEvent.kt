@@ -7,6 +7,7 @@ sealed interface StepCounterEvent {
     data object RequestPhysicalActivityPermission: StepCounterEvent
     data object CheckCanShowRequestPhysicalActivityPermission: StepCounterEvent
     data object RequestForBatteryOptimization : StepCounterEvent
+    data object RequestNotificationPermission: StepCounterEvent
     
     data object StartStepCounterService: StepCounterEvent
     data object StopStepCounterService: StepCounterEvent

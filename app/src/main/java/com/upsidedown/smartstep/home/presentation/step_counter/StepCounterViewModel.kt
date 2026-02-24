@@ -1,7 +1,6 @@
 package com.upsidedown.smartstep.home.presentation.step_counter
 
 import android.util.Log
-import androidx.compose.ui.text.style.TextDecoration.Companion.combine
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.upsidedown.smartstep.core.database.domain.model.Step
@@ -26,10 +25,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import kotlin.math.roundToInt
-
-// Assuming these enums exist in the profile package
-// enum class WeightUnit { KG, LB }
-// enum class Gender { MALE, FEMALE }
 
 class StepCounterViewModel(
     private val stepRepository: StepRepository,
@@ -103,7 +98,11 @@ class StepCounterViewModel(
 
             StepCounterAction.OnClickOk -> onClickOk()
             StepCounterAction.OnDismissCloseDialog -> onDismissCloseDialog()
-            is StepCounterAction.OnCheckPermissionResult -> onCheckPermissionResult( action.activityRecognitionResult, action.backgroundLocationResult)
+            is StepCounterAction.OnCheckPermissionResult -> onCheckPermissionResult( 
+                action.activityRecognitionResult, 
+                action.backgroundLocationResult,
+                action.notificationPermissionResult
+            )
             StepCounterAction.OnClickAllowPhysicalActivity -> onClickAllowPhysicalActivity()
             StepCounterAction.OnClickOpenSettings -> onClickOpenSetting()
             is StepCounterAction.OnResultRequestingPhysicalActivity -> onResultRequestingPhysicalActivity(action.result)
@@ -139,6 +138,9 @@ class StepCounterViewModel(
             }
             is StepCounterAction.OnDateSelected -> {
                 _state.update { it.copy(selectedDateInEdit = action.date, isDatePickerDialogShown = false) }
+            }
+            is StepCounterAction.OnResultRequestingNotificationPermission -> {
+                _state.update { it.copy(hasNotificationPermission = action.result) }
             }
         }
     }
@@ -262,7 +264,8 @@ class StepCounterViewModel(
 
     private fun onCheckPermissionResult(
         activityRecognitionResult: Boolean,
-        ignoreBatteryOptimizationIgnore: Boolean
+        ignoreBatteryOptimizationIgnore: Boolean,
+        notificationPermissionResult: Boolean
     ) {
         viewModelScope.launch {
             val prevState = _state.value
@@ -270,6 +273,7 @@ class StepCounterViewModel(
                 it.copy(
                     hasActivityRecognitionPermission = activityRecognitionResult,
                     hasIgnoreBatteryOptimizationPermission = ignoreBatteryOptimizationIgnore,
+                    hasNotificationPermission = notificationPermissionResult
                 )
             }
 
@@ -280,6 +284,16 @@ class StepCounterViewModel(
                     _state.update {
                         it.copy(isIgnoreBatteryOptimizationDialogShown = true)
                     }
+                } else if (!notificationPermissionResult) {
+                     _event.send(StepCounterEvent.RequestNotificationPermission)
+                }
+            }
+            
+            // If battery optimization was just granted (e.g. user came back from system dialog)
+            // and notification permission is not yet granted, request it.
+            if (!prevState.hasIgnoreBatteryOptimizationPermission && ignoreBatteryOptimizationIgnore) {
+                if (!notificationPermissionResult) {
+                    _event.send(StepCounterEvent.RequestNotificationPermission)
                 }
             }
         }

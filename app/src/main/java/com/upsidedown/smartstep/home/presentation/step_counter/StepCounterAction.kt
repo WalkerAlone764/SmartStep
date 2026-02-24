@@ -12,7 +12,8 @@ sealed interface StepCounterAction {
 
     data class OnCheckPermissionResult(
         val activityRecognitionResult: Boolean,
-        val backgroundLocationResult: Boolean
+        val backgroundLocationResult: Boolean,
+        val notificationPermissionResult: Boolean
     ): StepCounterAction
 
     data object OnClickAllowPhysicalActivity: StepCounterAction
@@ -45,4 +46,6 @@ sealed interface StepCounterAction {
     data object OnClickDate: StepCounterAction
     data object OnDismissDatePickerDialog: StepCounterAction
     data class OnDateSelected(val date: LocalDate): StepCounterAction
+
+    data class OnResultRequestingNotificationPermission(val result: Boolean): StepCounterAction
 }

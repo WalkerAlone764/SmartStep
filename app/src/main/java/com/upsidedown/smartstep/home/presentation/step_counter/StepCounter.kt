@@ -87,6 +87,14 @@ fun StepCounterRoot(
         }
     )
 
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            Log.d("Permission", "Notification permission launcher $isGranted")
+            viewModel.onAction(StepCounterAction.OnResultRequestingNotificationPermission(isGranted))
+        }
+    )
+
     ObserveAsEvents(viewModel.event) { event ->
         when(event) {
             StepCounterEvent.ExitApp -> {
@@ -103,14 +111,22 @@ fun StepCounterRoot(
                 val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
                 val ignoreBatteryOptimizationResult = powerManager.isIgnoringBatteryOptimizations(context.packageName)
                 Log.d("Permission", "ignoreBatteryOptimizationResult permission $ignoreBatteryOptimizationResult")
+                
+                val notificationPermissionResult = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+                } else {
+                    true
+                }
+
                 viewModel.onAction(
                     OnCheckPermissionResult(
                         activityRecognitionResult = activityRecognitionResult,
-                        backgroundLocationResult = ignoreBatteryOptimizationResult
+                        backgroundLocationResult = ignoreBatteryOptimizationResult,
+                        notificationPermissionResult = notificationPermissionResult
                     )
                 )
                 
-                if (activityRecognitionResult) {
+                if (activityRecognitionResult && ignoreBatteryOptimizationResult) {
                     val intent = Intent(context, StepCounterService::class.java).apply {
                         action = StepCounterService.ACTION_START
                     }
@@ -153,8 +169,28 @@ fun StepCounterRoot(
 
             StepCounterEvent.RequestForBatteryOptimization -> {
                 context.requestForBatteryOptimization()
+                val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+                val ignoreBatteryOptimizationResult = powerManager.isIgnoringBatteryOptimizations(context.packageName)
+               if (ignoreBatteryOptimizationResult) {
+                   val intent = Intent(context, StepCounterService::class.java).apply {
+                       action = StepCounterService.ACTION_START
+                   }
+                   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                       context.startForegroundService(intent)
+                   } else {
+                       context.startService(intent)
+                   }
+               }
             }
             
+            StepCounterEvent.RequestNotificationPermission -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                } else {
+                    viewModel.onAction(StepCounterAction.OnResultRequestingNotificationPermission(true))
+                }
+            }
+
             StepCounterEvent.StartStepCounterService -> {
                 val intent = Intent(context, StepCounterService::class.java).apply {
                     action = StepCounterService.ACTION_START
