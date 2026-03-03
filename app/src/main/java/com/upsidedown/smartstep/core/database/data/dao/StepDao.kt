@@ -28,8 +28,9 @@ interface StepDao {
         )
     }
 
-    @Query("UPDATE steps SET count = :count WHERE date = :date")
-    suspend fun updateStepsByDate(date: LocalDate, count: Int)
+    suspend fun updateStepsByDate(date: LocalDate, count: Int) {
+        upsertStep(StepEntity(date = date, count = count))
+    }
 
     @Query("UPDATE steps SET count = 0 WHERE date = :date")
     suspend fun resetStepsForDate(date: LocalDate)

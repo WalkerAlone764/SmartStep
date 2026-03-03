@@ -39,4 +39,7 @@
     <string name="min">min</string>
     <string name="step_counter_paused">Paused</string>
     <string name="edit_steps">Edit Steps</string>
+    <string name="notification_channel_name">Step Counter</string>
+    <string name="notification_title">Smart Step Counter</string>
+    <string name="notification_active">Active</string>
 </resources>

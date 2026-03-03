@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="12dp"
+    android:paddingEnd="16dp">
+
+    <!-- Header container -->
+    <RelativeLayout
+        android:id="@+id/header_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp">
+
+        <!-- Stats Container - Explicitly centered horizontally -->
+        <LinearLayout
+            android:id="@+id/stats_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/icon_steps"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/speed"
+                android:tint="#3A43B6" />
+
+            <TextView
+                android:id="@+id/notification_steps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="0"
+                android:textColor="#1F2024"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <!-- Divider: Fixed width and darker color for visibility -->
+            <TextView
+                android:layout_width="1.5dp"
+                android:layout_height="22dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="#D1D5DB" />
+
+            <ImageView
+                android:id="@+id/icon_calories"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/ic_calories"
+                android:tint="#3A43B6" />
+
+            <TextView
+                android:id="@+id/notification_calories"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="0"
+                android:textColor="#1F2024"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Action button -->
+        <FrameLayout
+            android:id="@+id/notification_action_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_circle_button" />
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_chevron_right"
+                android:tint="@android:color/white" />
+        </FrameLayout>
+    </RelativeLayout>
+
+    <!-- Progress bar -->
+    <ProgressBar
+        android:id="@+id/notification_progress"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:layout_below="@id/header_container"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:progress="0"
+        android:progressDrawable="@drawable/notification_progress_drawable" />
+
+</RelativeLayout>
